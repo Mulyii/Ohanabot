@@ -27,7 +27,7 @@ def luck_simple(num) :
 Map = {}
 def re_load() :
     now_day = True
-    with open("src\\plugins\\jrrp\\plugins\\data\\id_lucknum.txt", "r", encoding="utf-8") as f:
+    with open("src\\plugins\\jrrp\\data\\id_lucknum.txt", "r", encoding="utf-8") as f:
         for line in f.readlines():
             line.strip("\n")
             if line.startswith("date:") :
@@ -39,7 +39,7 @@ def re_load() :
                 id_num = line.split(" ")
                 Map[id_num[0]] = eval(id_num[1])
     if now_day == False:
-        with open("src\\plugins\\jrrp\\plugins\\data\\id_lucknum.txt", "w", encoding="utf-8") as f :
+        with open("src\\plugins\\jrrp\\data\\id_lucknum.txt", "w", encoding="utf-8") as f :
             f.write("date:" + date.today().strftime("%y%m%d") + "\n")
 
 re_load()
@@ -47,7 +47,7 @@ re_load()
 jrrp = on_command (
     "今日人品",
     aliases={"jrrp"},
-    priority=50,
+    priority=1,
     block=True,
     )
 
@@ -63,7 +63,7 @@ async def jrrp_handle(bot: Bot, event : Event):
         # rnd.seed(int(date.today().strftime("%y%m%d")) + int(id))
         lucknum = rnd.randint(0, 100)
         Map[id] = lucknum
-        with open("src\\plugins\\jrrp\\plugins\\data\\id_lucknum.txt", "a", encoding="utf-8") as f :
+        with open("src\\plugins\\jrrp\\data\\id_lucknum.txt", "a", encoding="utf-8") as f :
             f.write("{} {}\n".format(id, lucknum))
     await jrrp.finish(Message(f'[CQ:at,qq={event.get_user_id()}]您今日的幸运指数是{lucknum}/100（越低越好），为"{luck_simple(lucknum)}"'))
 
