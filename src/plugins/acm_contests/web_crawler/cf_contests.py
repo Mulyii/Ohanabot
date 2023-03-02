@@ -38,3 +38,4 @@ def codeforces_contests() :
             # print(name_text, time_text)
             res += "{}\n{}\n".format(name_text, time_text)
         return res
+codeforces_contests()
