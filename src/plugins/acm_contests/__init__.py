@@ -12,7 +12,4 @@ contests = on_command (
 @contests.handle()
 async def consest_handle(bot : Bot, event : Event) :
     res = codeforces_contests()
-    meg = ""
-    for na_ti in res :
-        meg += "比赛名称：{}\n比赛时间：{}\n".format(na_ti[0], na_ti[1])
-    await contests.finish(meg)
+    await contests.finish(res)

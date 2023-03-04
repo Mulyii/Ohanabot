@@ -23,7 +23,7 @@ def codeforces_contests() :
         rows = table('tr')
         # 遍历每一行元素（跳过第一行表头）
         
-        res = list()
+        res = ""
         for row in rows[1:]:
             # 创建pyquery对象
             row = pq(row)
@@ -37,5 +37,5 @@ def codeforces_contests() :
             time_text = time_cell.text().strip()
             # 打印比赛名称和时间
             # print(id_cell, name_text, time_text)
-            res.append((name_text, time_text))
+            res += "比赛名称：{}\n比赛时间：{}\n".format(name_text, time_text)
         return res
