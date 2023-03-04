@@ -15,4 +15,4 @@ async def consest_handle(bot : Bot, event : Event) :
     meg = ""
     for na_ti in res :
         meg += "比赛名称：{}\n比赛时间：{}\n".format(na_ti[0], na_ti[1])
-    await meg
+    await contests.finish(meg)
