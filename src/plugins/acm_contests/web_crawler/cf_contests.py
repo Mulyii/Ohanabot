@@ -26,7 +26,7 @@ def codeforces_contests() :
         res = list()
         for row in rows[1:]:
             # 创建pyquery对象
-            print(row())
+            row = pq(row)
             # 获取比赛名称所在的单元格元素（通过css选择器）
             name_cell = row('td:nth-child(1)')
             # 获取比赛名称文本（去除空白字符）
