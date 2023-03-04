@@ -37,5 +37,5 @@ def codeforces_contests() :
             time_text = time_cell.text().strip()
             # 打印比赛名称和时间
             # print(id_cell, name_text, time_text)
-            res.insert(name_text, time_text)
+            res.append(name_text, time_text)
         return res
