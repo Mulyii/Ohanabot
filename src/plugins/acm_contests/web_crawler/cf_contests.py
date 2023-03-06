@@ -38,4 +38,8 @@ def codeforces_contests() :
             # 打印比赛名称和时间
             # print(id_cell, name_text, time_text)
             res += "比赛名称：{}\n比赛时间：{}\n".format(name_text, time_text)
+<<<<<<< HEAD
         return res
+=======
+        return res
+>>>>>>> 66b4f32c319738b298e6874c34cedf02b60bed34

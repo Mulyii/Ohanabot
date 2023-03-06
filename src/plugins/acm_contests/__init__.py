@@ -12,4 +12,8 @@ contests = on_command (
 @contests.handle()
 async def consest_handle(bot : Bot, event : Event) :
     res = codeforces_contests()
+<<<<<<< HEAD
     await contests.finish(res)
+=======
+    await contests.finish(res)
+>>>>>>> 66b4f32c319738b298e6874c34cedf02b60bed34
