@@ -23,11 +23,10 @@ def codeforces_contests() :
         rows = table('tr')
         # 遍历每一行元素（跳过第一行表头）
         
-        res = list()
+        res = ""
         for row in rows[1:]:
             # 创建pyquery对象
             row = pq(row)
-            print(row())
             # 获取比赛名称所在的单元格元素（通过css选择器）
             name_cell = row('td:nth-child(1)')
             # 获取比赛名称文本（去除空白字符）
@@ -38,5 +37,5 @@ def codeforces_contests() :
             time_text = time_cell.text().strip()
             # 打印比赛名称和时间
             # print(id_cell, name_text, time_text)
-            res.insert(name_text, time_text)
+            res += "比赛名称：{}\n比赛时间：{}\n".format(name_text, time_text)
         return res
