@@ -39,3 +39,4 @@ def codeforces_contests() :
             # print(id_cell, name_text, time_text)
             res += "比赛名称：{}\n比赛时间：{}\n".format(name_text, time_text)
         return res
+codeforces_contests()
