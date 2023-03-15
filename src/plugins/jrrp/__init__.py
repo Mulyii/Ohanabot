@@ -70,3 +70,4 @@ async def jrrp_handle(bot: Bot, event : Event):
 
 from nonebot_plugin_apscheduler import scheduler
 job = scheduler.add_job(re_load, "cron", hour = 0, minute = 0)
+    
