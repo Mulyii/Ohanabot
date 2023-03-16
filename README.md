@@ -189,3 +189,84 @@
 qt端（三个人）：lgx 蔡嘉生 ljr
 
 python端（两个人）：徐建奇 徐晨威
+
+
+
+## 架构设计
+
+**所有命名方法采用驼峰命名法**
+
+**数据库所有命名包括指令采用全小写表达**
+
+**写注释，写注释，写注释**
+
+**如需更多类可以自行添加，同时更新文档**
+
+**窗口允许放大缩小**
+
+### QT
+
+采用.hpp的写法，除主函数外不得有全局函数，不得有全局变量。
+
+#### DataBaseConnection类
+
+``` CPP
+typedef string DataBaseConnectionErrorInfo;
+```
+
+``` CPP
+private:
+// 数据库指针
+// SqlQuery指针
+public:
+DataBaseConnection(); // 构造函数中连接Mysql数据库，连接失败throw错误(DataBaseConnectionErrorInfo)
+void sqlCommand(string sql); // 执行sql指令
+~DataBaseConnection(); // 释放所有指针
+```
+
+#### (Table)Connection类(这里的Table是变量，对于不同表建一个类)
+
+```CPP
+class TableConnection : public DataBaseConnection{
+private:
+public:
+    TableConnection(); // table名
+    ~TableConnection();
+    void tableCommand(string sql); // 仅对该table操作，调用sqlCommand
+}
+```
+
+#### (Table)Operation类
+
+``` CPP
+class TableOperation : public TableConnection{
+private:
+public:
+    TableOperation(string table); // 构造函数
+    ~TableOperation();
+    void insert(); // 插入
+    void update(); // 更新
+    void delete(); // 删除
+}
+```
+
+#### (Table)Class类(对于每个表建实体类)
+
+``` CPP
+class TableClass{
+private:
+    // 所有属性对应变量
+public:
+    // 默认构造函数，普通构造函数， 拷贝构造函数（深拷贝），析构函数
+    // set 和 get 函数
+    // 重载 = 号， 深拷贝
+}
+```
+
+（在此处添加）
+
+
+
+### python端
+
+不知道该怎么写。
