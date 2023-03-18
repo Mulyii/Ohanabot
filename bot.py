@@ -1,7 +1,6 @@
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter as ONEBOT_V11Adapter
 
-
 nonebot.init(apscheduler_autostart=True)
 
 driver = nonebot.get_driver()
