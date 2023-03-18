@@ -78,13 +78,30 @@ class DataBase:
 
     def users_find_stuid(self, student_id: str): # users学号查询，返回所有实例
         sql = f"select * from users where stuid='{student_id}'"
-        return self.exec(sql, "In function users_find_stuid users select failed").fetchall()
+        cursor = self.exec(sql, "In function users_find_stuid users select failed")
+        result = cursor.fetchone()
+        colums = [col[0] for col in cursor.description]
+        if result:
+            return dict(zip(columns, result))
+        else:
+            return None
 
     def users_find_qq(self, qq: str): # users qq号查询，返回所有实例
         sql = f"select * from users where qq='{qq}'"
-        return self.exec(sql, "In function users_find_qq users select failed").fetchall()
+        cursor = self.exec(sql, "In function users_find_qq users select failed")
+        result = cursor.fetchone()
+        columns = [col[0] for col in cursor.description]
+        if result:
+            return dict(zip(columns, result))
+        else:
+            return None
 
     def users_find_realname(self, real_name: str):# users姓名查询，返回所有实例
         sql = f"select * from users where realname='{real_name}'"
         return self.exec(sql, "In function users_find_realname users select failed").fetchall()
+
+    def users_update(self, id: int, user: User):
+        sql = f"update users set realname='{user.real_name}', qq='{user.qq}', stuid='{user.student_id}', codeforces='{user.codeforces_id}' \
+        where userid={id}"
+        return self.exec(sql).rowcount > 0
 

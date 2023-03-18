@@ -24,7 +24,6 @@ def split_to_pair(s: str) -> list:
 
 @unregister.handle()
 async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
-    qq_account.delete_front_message(len(cmd))
     if qq_account.type == "group":
         await response("!!!仅限私聊!!!", qq_account.uid)
         return
