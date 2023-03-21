@@ -1,6 +1,21 @@
 import pymysql
 from ..lib.config import ConfigClass
 
+class Problem:
+    url: str
+    id: str
+    name: str
+    number: str
+
+    def __init__(self, url: str, id: str, name: str, number: str):
+        self.url = url
+        self.id = id
+        self.name = name
+        self.number = number
+
+    def to_string(self) -> str:
+        return f"题目名称: {self.name}\n题目编号: {self.number}\n题目网址: {self.url}"
+    
 
 class User:
     real_name: str
@@ -33,7 +48,7 @@ class User:
         return True
 
     def to_string(self) -> str:
-        return f"real_name={self.real_name}, qq={self.qq}, student_id={self.student_id},codeforces_id={self.codeforces_id}"
+        return f"姓名: {self.real_name}\nqq号: {self.qq}\n学号: {self.student_id}\nCodeforces账号: {self.codeforces_id}"
 
 
 class DataBase:
@@ -80,7 +95,7 @@ class DataBase:
         sql = f"select * from users where stuid='{student_id}'"
         cursor = self.exec(sql, "In function users_find_stuid users select failed")
         result = cursor.fetchone()
-        colums = [col[0] for col in cursor.description]
+        columns = [col[0] for col in cursor.description]
         if result:
             return dict(zip(columns, result))
         else:
