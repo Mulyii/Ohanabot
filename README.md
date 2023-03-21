@@ -18,13 +18,13 @@
 
 ### 用户信息(users)
 
-| 列名     | 类型    | 长度   | 约束 | 是否为空  | 备注   |
-| -------- | ------- |------| ---- |-------|------|
-| userid   | int     |      | 主键 | 否、自增  |      |
-| realname | varchar | 20   |      | 否     | 实名   |
-| qq       | varchar | 11   |      | 否     |      |
-| stuid    | varchar | 10   |      | 否、不可重 | 学号   |
- | codeforces| varchar| 30   |      | 是| cf账号 |
+| 列名         | 类型       | 长度   | 约束  | 是否为空  | 备注   |
+|------------|----------|------|-----|-------|------|
+| userid     | int      |      | 主键  | 否、自增  |      |
+| realname   | varchar  | 20   |     | 否     | 实名   |
+| qq         | varchar  | 11   |     | 否     |      |
+| stuid      | varchar  | 10   |     | 否、不可重 | 学号   |
+ | codeforces | varchar  | 30   |     | 是| cf账号 |
 
 ### 比赛信息(contests)
 
@@ -41,12 +41,12 @@
 
 可以直接一个标号，对应计划表的编号
 
-| 列名        | 类型    | 长度 | 约束 | 是否为空 | 备注 |
-| ----------- | ------- | ---- | ---- | -------- | ---- |
-| missionid   | int     |      | 主键 | 否、自增 |      |
-| missionname | varchar | 255  |      | 否       |      |
-| description | varchar | 255  |      |          | 描述 |
-
+| 列名            | 类型      | 长度  | 约束  | 是否为空 | 备注      |
+|---------------|---------|-----|-----|---|---------|
+| missionid     | int     |     | 主键  | 否、自增 |         |
+| missionname   | varchar | 255 |     | 否 |         |
+| description   | varchar | 255 |     |   | 描述      |
+| nextmissionid | int     |     |     | 否 | 下一个计划标号 |
 
 
 ### 题单(tasks)
@@ -66,13 +66,13 @@
 
 要求，要存题目地址网址，方便爬虫获取信息
 
-| 列名          | 类型     | 长度  | 约束 | 是否为空 | 备注   |
-|--------------| ------- |-----| ---- | -------- |------|
-| problemid    | int     |     | 主键  | 否、自增  |      |
-| problemname  | varchar | 20  |      | 否       | 题目名  |
-| website      | varchar | 20  |      | 否       | 网站名称 |
-| problemindex | varchar | 10  |      | 否       | 题目编号 |
-
+| 列名           | 类型      | 长度  | 约束  | 是否为空 | 备注   |
+|--------------|---------|-----|-----|------|------|
+| problemid    | int     |     | 主键  | 否、自增 |      |
+| problemname  | varchar | 20  |     | 否    | 题目名  |
+| website      | varchar | 20  |     | 否    | 网站名称 |
+| problemindex | varchar | 10  |     | 否    | 题目编号 |
+| url          | varchar | 100 |     | 否    | 题目网址 |
 
 ## 教练端
 
