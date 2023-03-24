@@ -1,4 +1,4 @@
-from nonebot.adapters.onebot.v11.message import Message
+from nonebot.adapters.onebot.v11.message import Message, MessageSegment
 from nonebot.permission import SUPERUSER
 from nonebot.matcher import Matcher
 from nonebot.plugin import PluginMetadata
@@ -50,6 +50,6 @@ async def _(matcher: Matcher):
 async def _(arg: Message = CommandArg()):
     msg = arg.extract_plain_text().strip()
     if not msg:
-        await memu.finish(data_manager.get_memu_names())
+        await memu.finish(MessageSegment.image(await data_manager.get_memu_names()))
     elif msg.isdigit() :
-        await memu.finish(data_manager.get_details(eval(msg)))
+        await memu.finish(MessageSegment.image(await data_manager.get_details(eval(msg))))

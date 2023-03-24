@@ -4,6 +4,8 @@ from nonebot.plugin import PluginMetadata
 from nonebot import logger
 from pydantic import error_wrappers
 from typing import List
+from nonebot.adapters.onebot.v11.message import Message
+from nonebot_plugin_htmlrender import md_to_pic
 
 
 class Data_manager(object):
@@ -40,19 +42,21 @@ class Data_manager(object):
         self.plugins_memu_list_name = [
             id.name for id in self.plugins_memu_list]
 
-    def get_memu_names(self):
-        memu_names = f"菜单：\n"
+    async def get_memu_names(self):
+        memu_names = '<div align="center">\n <h1> 菜单 </h1> \n</div>'
         id = 1
         for name in self.plugins_memu_list_name:
-            memu_names += f'{id}: {name}\n'
+            memu_names += f"* {id} .  **{name}**\n"
             id += 1
-        return memu_names
+        return await md_to_pic(memu_names)
 
-    def get_details(self, plugin_id):
-        details = f''
+    async def get_details(self, plugin_id):
+        details: Message = f''
         if plugin_id <= len(self.plugins_memu_list_name):
             plugin_item = self.plugins_memu_list[plugin_id - 1]
-            details = f'名称：{plugin_item.name}\n功能：{plugin_item.description}\n用法：{plugin_item.usage}'
-        else :
+            details = f'* **名称**：{plugin_item.name}\n'\
+                f'* **功能**：{plugin_item.description}\n' \
+                f'* **用法**：{plugin_item.usage}'
+        else:
             details = f'请输入正确的编号\n'
-        return details
+        return await md_to_pic(details)
