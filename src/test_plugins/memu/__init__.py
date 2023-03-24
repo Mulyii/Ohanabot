@@ -20,7 +20,7 @@ async def _():
 
 plugins_memu_list = Plugins_memu_list()
 memu_switch = True
-memu = on_command("菜单", aliases={"memu", "帮助", "功能"}, priority=5, block=True)
+memu = on_command("菜单", aliases={"memu", "帮助", "功能", "help"}, priority=5, block=True)
 switch_on = on_command("开启菜单", priority=5, permission=SUPERUSER, block=True)
 switch_off = on_command("关闭菜单", priority=5, permission=SUPERUSER, block=True)
 
