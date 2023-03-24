@@ -10,5 +10,5 @@ adapters = [
     { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" }
 ]
 plugins = []
-plugin_dirs = ["src/test_plugins", "src/plugins", "src/plugins_in_components"]
+plugin_dirs = ["src/test_plugins"]
 builtin_plugins = ["echo"]

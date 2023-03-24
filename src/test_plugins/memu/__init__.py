@@ -3,7 +3,8 @@ from nonebot.permission import SUPERUSER
 from nonebot.matcher import Matcher
 from nonebot.plugin import PluginMetadata
 from nonebot import on_command, get_driver
-from .Load_Data import Plugins_memu_list
+from nonebot.params import CommandArg
+from .Data_manager import Data_manager
 
 __plugin_meta__ = PluginMetadata(
     name="菜单",
@@ -13,16 +14,23 @@ __plugin_meta__ = PluginMetadata(
 
 driver = get_driver()
 
+
 @driver.on_startup
 async def _():
-    plugins_memu_list.load_plugin_info()
+    data_manager.load_plugin_info()
 
 
-plugins_memu_list = Plugins_memu_list()
+data_manager = Data_manager()
 memu_switch = True
-memu = on_command("菜单", aliases={"memu", "帮助", "功能", "help"}, priority=5, block=True)
+
+
+async def memu_switch_rule():
+    return memu_switch
+memu = on_command("菜单", aliases={
+                  "memu", "帮助", "功能", "help"}, priority=5, block=True, rule=memu_switch_rule)
 switch_on = on_command("开启菜单", priority=5, permission=SUPERUSER, block=True)
 switch_off = on_command("关闭菜单", priority=5, permission=SUPERUSER, block=True)
+
 
 @switch_on.handle()
 async def _(matcher: Matcher):
@@ -39,11 +47,9 @@ async def _(matcher: Matcher):
 
 
 @memu.handle()
-async def _():
-    msg = f'菜单\n'
-    id = 1
-    for plugin_name in plugins_memu_list.plugins_memu_list_name:
-        msg += f'{id}.{plugin_name}\n'
-        id += 1
-    if memu_switch:
-        await memu.finish(Message(msg))
+async def _(arg: Message = CommandArg()):
+    msg = arg.extract_plain_text().strip()
+    if not msg:
+        await memu.finish(data_manager.get_memu_names())
+    elif msg.isdigit() :
+        await memu.finish(data_manager.get_details(eval(msg)))
