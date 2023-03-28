@@ -1,5 +1,5 @@
 import nonebot.plugin
-from .DataStruct import Plugin_Memu_item
+from .DataStruct import Plugin_Menu_item
 from nonebot.plugin import PluginMetadata
 from nonebot import logger
 from pydantic import error_wrappers
@@ -10,13 +10,13 @@ from nonebot_plugin_htmlrender import md_to_pic
 
 class Data_manager(object):
     def __init__(self):
-        self.plugins_memu_list: List[Plugin_Memu_item] = []
-        self.plugins_memu_list_name: List[str] = []
+        self.plugins_menu_list: List[Plugin_Menu_item] = []
+        self.plugins_menu_list_name: List[str] = []
 
     def load_plugin_info(self):
         def load_from_dict(_meta_data: PluginMetadata):
-            self.plugins_memu_list.append(
-                Plugin_Memu_item(
+            self.plugins_menu_list.append(
+                Plugin_Menu_item(
                     name=_meta_data.name,
                     description=_meta_data.description,
                     usage=_meta_data.usage,
@@ -38,22 +38,22 @@ class Data_manager(object):
                         f"{plugin.name} 菜单数据加载失败\n"
                         f"{e}"
                     )
-        self.plugins_memu_list.sort(key=lambda x: x.name.encode("gbk"))
-        self.plugins_memu_list_name = [
-            id.name for id in self.plugins_memu_list]
+        self.plugins_menu_list.sort(key=lambda x: x.name.encode("gbk"))
+        self.plugins_menu_list_name = [
+            id.name for id in self.plugins_menu_list]
 
-    async def get_memu_names(self):
-        memu_names = '<div align="center">\n <h1> 菜单 </h1> \n</div>'
+    async def get_menu_names(self):
+        menu_names = '<div align="center">\n <h1> 菜单 </h1> \n</div>'
         id = 1
-        for name in self.plugins_memu_list_name:
-            memu_names += f"* {id} .  **{name}**\n"
+        for name in self.plugins_menu_list_name:
+            menu_names += f"* {id} .  **{name}**\n"
             id += 1
-        return await md_to_pic(memu_names)
+        return await md_to_pic(menu_names)
 
     async def get_details(self, plugin_id):
         details: Message = f''
-        if plugin_id <= len(self.plugins_memu_list_name):
-            plugin_item = self.plugins_memu_list[plugin_id - 1]
+        if plugin_id <= len(self.plugins_menu_list_name):
+            plugin_item = self.plugins_menu_list[plugin_id - 1]
             details = f'* **名称**：{plugin_item.name}\n'\
                 f'* **功能**：{plugin_item.description}\n' \
                 f'* **用法**：{plugin_item.usage}'
