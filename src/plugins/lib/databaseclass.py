@@ -1,13 +1,14 @@
 import pymysql
 from ..lib.config import ConfigClass
+import datetime
 
-class Problem:
+class Problem: # 数据库题目类
     url: str
-    id: str
+    id: int
     name: str
     number: str
 
-    def __init__(self, url: str, id: str, name: str, number: str):
+    def __init__(self, url: str, id: int, name: str, number: str):
         self.url = url
         self.id = id
         self.name = name
@@ -15,9 +16,54 @@ class Problem:
 
     def to_string(self) -> str:
         return f"题目名称: {self.name}\n题目编号: {self.number}\n题目网址: {self.url}"
-    
 
-class User:
+class Score: # 数据库成绩类
+    contest_id: int
+    user_id: int
+    rank: int
+    number: int
+    penalty: int
+
+    def __init__(self, contest_id: int, user_id: int, rank: int, number: int, penalty: int):
+        self.contest_id = contest_id
+        self.user_id = user_id
+        self.rank = rank
+        self.number = number
+        self.penalty = penalty
+
+class Contest: # 数据库比赛类
+    contest_id: int
+    contest_name: str
+    time: str
+    duration: str
+
+    def __init__(self, contest_id: int, contest_name: str, time: datetime, duration: datetime):
+        self.contest_id = contest_id
+        self.contest_name = contest_name
+        self.datetime = datetime
+        self.duration = duration
+
+class Mission: # 数据库任务类
+    mission_id: int
+    mission_name: str
+    description: str
+    next_mission_id: int
+
+    def __init__(self, mission_id: int, mission_name: str, description: str, next_mission: int):
+        self.mission_id = mission_id
+        self.mission_name = mission_name
+        self.description = description
+        self.next_mission_id = next_mission
+
+class task: # 数据库任务类
+    mission_id: int
+    problem_id: int
+
+    def __init__(self, mission_id: int, problem_id: int):
+        self.mission_id = mission_id
+        self.problem_id = problem_id
+
+class User: # 数据库用户类
     real_name: str
     qq: str
     student_id: str
@@ -115,7 +161,7 @@ class DataBase:
         sql = f"select * from users where realname='{real_name}'"
         return self.exec(sql, "In function users_find_realname users select failed").fetchall()
 
-    def users_update(self, id: int, user: User):
+    def users_update(self, id: int, user: User): # users更新
         sql = f"update users set realname='{user.real_name}', qq='{user.qq}', stuid='{user.student_id}', codeforces='{user.codeforces_id}' \
         where userid={id}"
         return self.exec(sql).rowcount > 0

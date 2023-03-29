@@ -6,7 +6,7 @@ from nonebot.params import Depends
 from ..lib.databaseclass import User
 from ..lib.databaseclass import DataBase
 
-register = on_command("#register")
+register = on_command("register")
 
 
 def split_to_pair(s: str) -> list:

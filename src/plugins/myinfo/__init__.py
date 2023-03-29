@@ -1,17 +1,18 @@
 import pymysql
 from nonebot import on_command
 from nonebot.adapters.onebot.v11.message import Message
+from nonebot.adapters.onebot.v11 import GROUP_MEMBER
 from ..lib.dependclass import DependClass
 from nonebot.params import Depends
 from ..lib.databaseclass import User
 from ..lib.databaseclass import DataBase
 
 
-my_info = on_command("#myinfo")
-set_help = on_command("#sethelp")
-set_name = on_command("#setname")
-set_stuid = on_command("#setstuid")
-set_codeforces = on_command("#setcodeforces")
+my_info = on_command("myinfo")
+set_help = on_command("sethelp")
+set_name = on_command("setname")
+set_stuid = on_command("setstuid")
+set_codeforces = on_command("setcodeforces")
 
 async def response(mes: str, uid=None):
     if uid == None:
@@ -29,11 +30,7 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
         try:
             info = db.users_find_qq(qq_account.uid)
             user = User(info["realname"], info["qq"], info["stuid"], info["codeforces"])
-            await response(f"""姓名: {user.real_name}
-qq号: {user.qq}
-学号: {user.student_id}
-codeforces账号: {user.codeforces_id}
-若要修改信息，可使用#sethelp来查询修改方法""")
+            await response(user.to_string() + "\n若要修改信息，可使用#sethelp来查询修改方法")
         except pymysql.IntegrityError as e:
             print(e)
             await response("出错了QAQ，向管理员提交错误报告")
@@ -65,6 +62,7 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
             await response("该账号未注册，请先用#register help查看注册方法")
             return
 
+        print(qq_account.title)
         print(qq_account.message)
 
         if qq_account.title == "#setname":

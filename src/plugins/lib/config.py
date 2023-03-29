@@ -1,7 +1,7 @@
 import json
 
 
-class ConfigClass:
+class ConfigClass: # 数据库配置类
     def __init__(self):
         self.database = {
             "host": "localhost",

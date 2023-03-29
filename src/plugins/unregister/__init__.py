@@ -5,7 +5,7 @@ from nonebot.params import Depends
 from ..lib.databaseclass import User
 from ..lib.databaseclass import DataBase
 
-cmd = "#unregister"
+cmd = "unregister"
 unregister = on_command(cmd=cmd)
 
 
