@@ -79,13 +79,13 @@ class User: # 数据库用户类
         self.student_id = student_id
         self.codeforces_id = codeforces_id
 
-    def check_qq(self, qq: str) -> bool:
+    def check_qq(self, qq: str) -> bool: # 检查qq号格式是否正确
         for c in qq:
             if not('0' <= c <= '9'):
                 return False
         return True
 
-    def check_student_id(self, student_id: str) -> bool:
+    def check_student_id(self, student_id: str) -> bool: # 检查学生学号是否正确
         if len(student_id) != 10:
             return False
         for c in student_id:
@@ -98,6 +98,9 @@ class User: # 数据库用户类
 
 
 class DataBase:
+    db = None # 数据库对象
+    con: ConfigClass # 数据库配置对象
+
     def __init__(self):
         try:
             con = ConfigClass()
@@ -114,6 +117,7 @@ class DataBase:
     def __del__(self):
         self.db.close()
 
+    # 执行sql命令，如果执行失败抛出错误failure_info,执行成功控制台输出success_info
     def exec(self, sql: str, failure_info: str = "", success_info: str = ""):
         cursor = self.db.cursor()
         try:
@@ -125,19 +129,23 @@ class DataBase:
             self.db.rollback()
             raise ValueError(failure_info)
 
-    def users_insert(self, user: User): # users插入，无返回值
+class UserTable(DataBase):
+    def __init__(self):
+        super(UserTable, self).__init__()
+
+    def insert(self, user: User): # users插入，无返回值
         sql = f"insert into users(realname, qq, stuid, codeforces) values('{user.real_name}', '{user.qq}', '{user.student_id}', '{user.codeforces_id}')"
         self.exec(sql, "In function users_insert users insert failed")
 
-    def users_delete(self, user: User): # users删除，返回删除行数
+    def delete(self, user: User): # users删除，返回删除行数
         sql = f"delete from users where realname='{user.real_name}' and qq='{user.qq}' and stuid='{user.student_id}'"
         return self.exec(sql, "In function users_delete users delete failed").rowcount
 
-    def users_find_all(self): # users查询，返回所有实例
+    def find_all(self): # users查询，返回所有实例
         sql = f"select * from users"
         return self.exec(sql, "In function users_find_all").fetchall()
 
-    def users_find_stuid(self, student_id: str): # users学号查询，返回所有实例
+    def find_stuid(self, student_id: str): # users学号查询，返回所有实例
         sql = f"select * from users where stuid='{student_id}'"
         cursor = self.exec(sql, "In function users_find_stuid users select failed")
         result = cursor.fetchone()
@@ -147,7 +155,7 @@ class DataBase:
         else:
             return None
 
-    def users_find_qq(self, qq: str): # users qq号查询，返回所有实例
+    def find_qq(self, qq: str): # users qq号查询，返回所有实例
         sql = f"select * from users where qq='{qq}'"
         cursor = self.exec(sql, "In function users_find_qq users select failed")
         result = cursor.fetchone()
@@ -157,11 +165,11 @@ class DataBase:
         else:
             return None
 
-    def users_find_realname(self, real_name: str):# users姓名查询，返回所有实例
+    def find_realname(self, real_name: str):# users姓名查询，返回所有实例
         sql = f"select * from users where realname='{real_name}'"
         return self.exec(sql, "In function users_find_realname users select failed").fetchall()
 
-    def users_update(self, id: int, user: User): # users更新
+    def update(self, id: int, user: User): # users更新
         sql = f"update users set realname='{user.real_name}', qq='{user.qq}', stuid='{user.student_id}', codeforces='{user.codeforces_id}' \
         where userid={id}"
         return self.exec(sql).rowcount > 0
