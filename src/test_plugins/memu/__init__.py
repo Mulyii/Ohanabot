@@ -28,8 +28,8 @@ async def menu_switch_rule():
     return menu_switch
 menu = on_command("菜单", aliases={
                   "menu", "帮助", "功能", "help"}, priority=5, block=True, rule=menu_switch_rule)
-switch_on = on_command("开启菜单", priority=5, permission=SUPERUSER, block=True)
-switch_off = on_command("关闭菜单", priority=5, permission=SUPERUSER, block=True)
+switch_on = on_command(("help","on"), priority=5, permission=SUPERUSER, block=True)
+switch_off = on_command(("help","off"), priority=5, permission=SUPERUSER, block=True)
 
 
 @switch_on.handle()

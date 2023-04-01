@@ -70,5 +70,6 @@ async def _(state: T_State, query: str = ArgPlainText(), qq_account: DependClass
     else:
         try:
             await chat.reject(f"{chatbot.ask(query)}")
-        except:
-            await chat.reject(f"回答内容超过上限")
+        except Exception as e:
+            logger.opt(colors=True).error(f"<r>发生异常, {e} </r>")
+            await chat.reject(f"发生异常")
