@@ -31,12 +31,12 @@ class Data_manager(object):
                 try:
                     load_from_dict(meta_data)
                     logger.opt(colors=True).success(
-                        f"{plugin.name} 菜单数据已加载"
+                        f"<g>{plugin.name} 菜单数据已加载</g>"
                     )
                 except error_wrappers.ValidationError as e:
                     logger.opt(colors=True).error(
-                        f"{plugin.name} 菜单数据加载失败\n"
-                        f"{e}"
+                        f"<r>{plugin.name} 菜单数据加载失败\n</r>"
+                        f"<r>{e}</r>"
                     )
         self.plugins_menu_list.sort(key=lambda x: x.name.encode("gbk"))
         self.plugins_menu_list_name = [

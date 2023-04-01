@@ -9,7 +9,7 @@ from .Data_manager import Data_manager
 __plugin_meta__ = PluginMetadata(
     name="菜单",
     description="这是一个菜单插件",
-    usage="菜单啊",
+    usage="输入help以获取功能菜单, 输入help + 对应的数字以获取对应菜单的详细功能"
 )
 
 driver = get_driver()
@@ -51,5 +51,7 @@ async def _(arg: Message = CommandArg()):
     msg = arg.extract_plain_text().strip()
     if not msg:
         await menu.finish(MessageSegment.image(await data_manager.get_menu_names()))
-    elif msg.isdigit():
+    elif not msg.isdigit() or eval(msg) > len(data_manager.plugins_menu_list):
+        await menu.finish(f"请输入阿拉伯数字{1}~{len(data_manager.plugins_menu_list)}以获取菜单的详细信息")
+    else:
         await menu.finish(MessageSegment.image(await data_manager.get_details(eval(msg))))

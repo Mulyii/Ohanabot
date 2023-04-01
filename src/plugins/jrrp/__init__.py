@@ -3,6 +3,15 @@ from datetime import date
 from nonebot import on_command
 from nonebot.adapters.onebot.v11.message import Message
 from nonebot.adapters.onebot.v11 import Bot, Event
+from nonebot.plugin import PluginMetadata
+
+
+__plugin_meta__ = PluginMetadata(
+    name="今日人品",
+    description="快来看看你今日的运势如何吧",
+    usage="回复#jrrp获得当日的幸运数字",
+)
+
 
 def luck_simple(num) :
     if num == 0 :
