@@ -1,5 +1,9 @@
 import nonebot
+import os
 from nonebot.adapters.onebot.v11 import Adapter as ONEBOT_V11Adapter
+
+if not os.path.exists("data") :
+    os.mkdir("data")
 
 nonebot.init(apscheduler_autostart=True)
 
