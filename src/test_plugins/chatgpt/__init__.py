@@ -4,7 +4,7 @@ from nonebot import on_command
 from nonebot import logger
 from nonebot.params import ArgPlainText
 from nonebot.params import Depends
-
+from nonebot.exception import RejectedException
 from lib.dependclass import DependClass
 from .Chatbot import ChatBot
 from nonebot.typing import T_State
@@ -62,14 +62,15 @@ async def _(state: T_State, query: str = ArgPlainText(), qq_account: DependClass
             chat.finish(f"出现了不可解决的问题，gpt启动失败")
 
     if try_count >= 10:
-        await chat.finish(f"已达次数上限，感谢使用")
+        await chat.finish(f"已达次数上限，对话结束，感谢使用")
     state["try_count"] = try_count + 1
 
     if query == "exit":
-        await chat.finish(f"感谢使用")
+        await chat.finish(f"对话已结束，感谢使用")
     else:
         try:
             await chat.reject(f"{chatbot.ask(query)}")
         except Exception as e:
-            logger.opt(colors=True).error(f"<r>发生异常, {e} </r>")
-            await chat.reject(f"发生异常")
+            if not isinstance(e, RejectedException):
+                logger.opt(colors=True).error(f"<r>发生异常, {e} </r>")
+                await chat.reject(f"发生异常")
