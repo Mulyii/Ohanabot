@@ -1,9 +1,9 @@
 from nonebot import on_command
 from nonebot.adapters.onebot.v11.message import Message
-from ..lib.dependclass import DependClass
+from lib.dependclass import DependClass
 from nonebot.params import Depends
-from ..lib.databaseclass import User
-from ..lib.databaseclass import DataBase
+from lib.databaseclass import User
+from lib.databaseclass import DataBase
 
 cmd = "unregister"
 unregister = on_command(cmd=cmd)

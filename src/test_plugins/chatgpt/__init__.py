@@ -5,7 +5,7 @@ from nonebot import logger
 from nonebot.params import ArgPlainText
 from nonebot.params import Depends
 
-from ...plugins.lib.dependclass import DependClass
+from lib.dependclass import DependClass
 from .Chatbot import ChatBot
 from nonebot.typing import T_State
 import openai
@@ -21,6 +21,8 @@ openai.organization = "org-m1n1DhFATSP7eMph8SSP9mRF"
 openai.api_key = "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"
 
 chat_switch = True
+async def chat_switch_rule():
+    return chat_switch
 
 switch_on = on_command(("chat", "on"), priority=5,
                        permission=SUPERUSER, block=True)
@@ -42,7 +44,7 @@ async def _():
     await switch_off.finish("聊天服务已经关闭")
 
 
-chat = on_command("chat", priority=50, block=True)
+chat = on_command("chat", priority=50, block=True, rule=chat_switch_rule)
 
 
 chatbot: ChatBot = None
@@ -50,8 +52,6 @@ chatbot: ChatBot = None
 
 @chat.got("query", prompt="现在有最多十次的对话机会，你可以在任何时候输入exit提前结束对话")
 async def _(state: T_State, query: str = ArgPlainText(), qq_account: DependClass = Depends(DependClass, use_cache=False)):
-    if not chat_switch:
-        chat.finish(f"很抱歉，该功能暂时关闭使用")
     global chatbot
     try_count = state.get("try_count", 1)
     if try_count == 1:

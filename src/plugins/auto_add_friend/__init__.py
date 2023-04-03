@@ -1,6 +1,6 @@
 from nonebot import on_request, on_command
 from nonebot.adapters.onebot.v11 import Bot, RequestEvent, FriendRequestEvent
-from ..lib.dependclass import DependClass
+from lib.dependclass import DependClass
 from nonebot.params import Depends
 from nonebot.adapters.onebot.v11.message import Message
 
