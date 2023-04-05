@@ -1,5 +1,5 @@
 import pymysql
-from .config import ConfigClass
+from lib.config import ConfigClass
 import datetime
 
 class Problem: # 数据库题目类
@@ -9,14 +9,15 @@ class Problem: # 数据库题目类
     index: str
     url: str
 
-    def __init__(self, url: str, id: int, name: str, number: str):
-        self.url = url
+    def __init__(self, id: int, name: str, website: str, index: str, url: str):
         self.id = id
         self.name = name
-        self.number = number
+        self.website = website
+        self.index = index
+        self.url = url
 
     def to_string(self) -> str:
-        return f"题目名称: {self.name}\n题目编号: {self.number}\n题目网址: {self.url}"
+        return f"{self.website}{self.name} {self.index}: {self.url}"
 
 class Score: # 数据库成绩类
     contest_id: int
@@ -45,16 +46,47 @@ class Contest: # 数据库比赛类
         self.duration = duration
 
 class Mission: # 数据库任务类
-    id: int
+    id: int = 0
     name: str
     description: str
-    next_id: int
 
-    def __init__(self, id: int, name: str, description: str, next_id: int):
+    def __init__(self, id: int, name: str, description: str):
         self.id = id
         self.name = name
         self.description = description
-        self.next_id = next_id
+
+    def find_index(self, lines, mission_id: int):
+        for i, line in enumerate(lines):
+            if line[0] == mission_id:
+                return i
+        return -1
+
+    def calc_mission_rank(self, mission_id: int) -> str:
+        mission_table = MissionTable()
+        lines = mission_table.find_all()
+
+        return f"{self.find_index(lines, mission_id) + 1}/{len(lines)}"
+
+    def find_next_mission(self, mission_id: int):
+        mission_table = MissionTable()
+        lines = mission_table.find_all()
+
+        ind: int = self.find_index(lines, mission_id)
+        if ind == len(lines) - 1:
+            return "无"
+        else:
+            mission = Mission(lines[ind + 1][0], lines[ind + 1][1], lines[ind + 1][2])
+            return mission
+
+        return "ERROR"
+
+    def to_string(self):
+        next_mission = self.find_next_mission(self.id)
+        print(isinstance(next_mission, Mission))
+        return f"""您现在的任务进度: {self.calc_mission_rank(self.id)}
+任务名: {self.name}
+详细信息: \n{self.description}
+下一个任务: {next_mission.name if isinstance(next_mission, Mission) else next_mission}"""
 
 class task: # 数据库任务类
     mission_id: int
@@ -71,11 +103,11 @@ class User: # 数据库用户类
     student_id: str
     codeforces_id: str
     mission_id: int
-    mission_name: str
 
-    def __init__(self, real_name: str, qq: str, student_id: str, codeforces_id: str = "", id: int = 0):
+    def __init__(self, real_name: str, qq: str, student_id: str, mission_id:str ="",codeforces_id: str = "",  id: int = 0):
         self.id = id
         self.real_name = real_name
+        self.mission_id = mission_id
         if not self.check_qq(qq):
             raise ValueError("qq账号格式不正确")
         self.qq = qq
@@ -103,7 +135,7 @@ class User: # 数据库用户类
 qq号: {self.qq}
 学号: {self.student_id}
 Codeforces账号: {self.codeforces_id}
-当前的任务:{self.mission_name}"""
+当前的任务:{self.mission_id}"""
 
 
 class DataBase:
@@ -134,9 +166,9 @@ class DataBase:
             self.db.commit()
             print(success_info)
             return cursor
-        except:
+        except Exception as e:
             self.db.rollback()
-            raise ValueError(failure_info)
+            raise ValueError(failure_info + ": " + e)
 
 class UserTable(DataBase):
     def __init__(self):
@@ -179,29 +211,39 @@ class UserTable(DataBase):
         return self.exec(sql, "In class UserTable function find_realname users select failed").fetchall()
 
     def update(self, id: int, user: User): # users更新
-        sql = f"update users set realname='{user.real_name}', qq='{user.qq}', stuid='{user.student_id}', codeforces='{user.codeforces_id}' \
+        sql = f"update users set realname='{user.real_name}', qq='{user.qq}', stuid='{user.student_id}', codeforces='{user.codeforces_id}', missionid={user.mission_id} \
         where userid={id}"
         return self.exec(sql, "In class UserTable function update user update error").rowcount > 0
 
 class MissionTable(DataBase):
     def __init__(self):
-        super(Mission, self).__init__()
+        super(MissionTable, self).__init__()
 
     def insert(self, mission: Mission):
         sql = f"insert into missions (missionid, missionname, description, nextmissionid) values ({mission.id}, '{mission.name}', '{mission.description}', {mission.next_id});"
         self.exec(sql, "In class MissionTable function insert mission insert error")
 
     def delete(self, mission: Mission):
-        sql = f"delete from misssions where missionid={mission.id}";
-        return self.exec(sql, "In class MissionTable function delete mission delete error").rowcount;
+        sql = f"delete from misssions where missionid={mission.id}"
+        return self.exec(sql, "In class MissionTable function delete mission delete error").rowcount
 
     def update(self, id: int, mission: Mission):
-        sql = f"update users set missionname='{mission.name}', description='{mission.description}, nextmissionid={mission.next_id}' where missionid={id};"
+        sql = f"update missions set missionname='{mission.name}', description='{mission.description}, nextmissionid={mission.next_id}' where missionid={id};"
         return self.exec(sql, "In class MissionTable function update mission update error").rowcount > 0
 
-    def find(self, id: int):
-        sql = f"select * from where missionid={id}"
-        return self.exec(sql, "In class MissionTable function find mission find error").fetchall()
+    def find(self, id: int) -> dict:
+        sql = f"select * from missions where missionid={id}"
+        cursor = self.exec(sql, "In class MissinTable function find mission find error")
+        result = cursor.fetchone()
+        columns = [col[0] for col in cursor.description]
+        if result:
+            return dict(zip(columns, result))
+        else:
+            return None
+
+    def find_all(self) -> tuple:
+        sql = f"select * from missions"
+        return self.exec(sql, "In class MissionTable function find_all mission find error").fetchall()
 
 class ProblemTable(DataBase):
     def __init__(self):
@@ -216,7 +258,7 @@ class ProblemTable(DataBase):
         return self.exec(sql, "In class ProblemTable function delete problem delete error")
 
     def find(self, id: int):
-        sql = f"select * from where problemid={id}"
+        sql = f"select * from problems where problemid={id}"
         return self.exec(sql, "In class ProblemTable function find problem find error").fetchall()
 
 class TaskTable(DataBase):
@@ -224,5 +266,5 @@ class TaskTable(DataBase):
         super(TaskTable, self).__init__()
 
     def find(self, id: int):
-        sql = f"select * from where problemid={id}"
+        sql = f"select * from tasks where problemid={id}"
         return self.exec(sql, "In class TaskTable function find task find error").fetchall()
