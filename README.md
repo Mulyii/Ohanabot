@@ -75,6 +75,19 @@
 | index | varchar | 10  |     | 否    | 题目编号 |
 | url    | varchar | 100 |     | 否    | 题目网址 |
 
+### 消息表(interactions)
+
+| 列名       | 类型       | 长度  | 约束     | 是否为空  | 备注                               |
+|----------|----------|-----|--------|-------|----------------------------------|
+| id       | int      |     | 主键、自增  | 否     | 编号                               |
+| sendtime | datetime |     |        | 否     | 消息发送时间                           |
+| sender   | varchar  | 30  |        | 否     | 消息发送人                            |
+| receiver | varchar  | 30  |        | 否     | 消息接受者                            |
+| typename | varchar  | 20  |        | 否     | 消息类型(group, private, add friend) |
+| comefrom | varchar  | 20  |        | 否     | 消息来源(群号，QQ号)                     |
+| message  | text     |     |        | 否     | 消息内容                             |
+| command  | varchar  | 20  |        | 否     | 触发命令                             |
+
 ## 教练端
 
 ### 要求
