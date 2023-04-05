@@ -1,11 +1,11 @@
 import pymysql
 from nonebot import on_command
-from nonebot.adapters.onebot.v11.message import Message
 from lib.dependclass import DependClass
 from nonebot.params import Depends
 from lib.databaseclass import User
 from lib.databaseclass import UserTable
 from lib.config import register_help, unregister_help
+from lib.dependclass import response
 
 register = on_command("register")
 unregister = on_command("unregister")
@@ -17,35 +17,28 @@ def split_to_pair(s: str) -> list:
     return list(filter(lambda x: len(x) > 0, ret))
 
 
-async def response(receiver, mes: str, uid=None):
-    if uid is None:
-        await receiver.finish(Message(f'{mes}'))
-    else:
-        await receiver.finish(Message(f'[CQ:at,qq={uid}] {mes}'))
-
-
 @register.handle()
 async def register_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     print("register recieved")
     print(qq_account.uid, qq_account.nickname, qq_account.message)
     if qq_account.type == "group":
-        await response(register, "!!!仅私聊可用!!!", uid=qq_account.uid)
+        await response(register, "!!!仅私聊可用!!!", qq_account)
         return
     if len(qq_account.message) == 0 or qq_account.message == "help":
-        await response(register, register_help)
+        await response(register, register_help, qq_account)
         return
     try:
         db = UserTable()
         if db.find_qq(qq_account.uid):
-            await response(register, "您已注册，若要再次注册，请输入#unregister注销账户")
+            await response(register, "您已注册，若要再次注册，请输入#unregister注销账户", qq_account)
             return
         ls: list = split_to_pair(qq_account.message)
         if len(ls) != 2:
-            await response(register, "不合法的输入")
+            await response(register, "不合法的输入", qq_account)
             return
         real_name, student_id = ls
         if db.find_stuid(student_id):
-            await response(register, "该学生已注册")
+            await response(register, "该学生已注册", qq_account)
             return
         try:
             print(f"real_name={real_name}, qq={qq_account.uid}, student_id={student_id}")
@@ -54,26 +47,26 @@ async def register_receiver(qq_account: DependClass = Depends(DependClass, use_c
             await response(register, f"""注册成功！！！
 姓名: {user.real_name}
 qq号: {user.qq}
-学号: {user.student_id}""")
+学号: {user.student_id}""", qq_account)
         except ValueError as e:
             print(e)
-            await response(register, "出错")
+            await response(register, "出错", qq_account)
     except pymysql.IntegrityError as e:
-        await response(register, "数据库连接出错，请管理员报告错误")
+        await response(register, "数据库连接出错，请管理员报告错误", qq_account)
 
 
 @unregister.handle()
 async def unregister_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     if qq_account.type == "group":
-        await response(unregister, "!!!仅限私聊!!!", qq_account.uid)
+        await response(unregister, "!!!仅限私聊!!!", qq_account)
         return
     elif len(qq_account.message) == 0 or qq_account.message == "help":
-        await response(unregister, unregister_help)
+        await response(unregister, unregister_help, qq_account)
         return
     else:
         ls: list = split_to_pair(qq_account.message)
         if len(ls) != 2:
-            await response(unregister, "不合法的输入")
+            await response(unregister, "不合法的输入", qq_account)
             return
         real_name, student_id = ls
         user = User(real_name=real_name, qq=qq_account.uid, student_id=student_id)
@@ -81,8 +74,8 @@ async def unregister_receiver(qq_account: DependClass = Depends(DependClass, use
         try:
             is_delete = db.delete(user)
             if is_delete > 0:
-                await response(unregister, "删除成功")
+                await response(unregister, "删除成功", qq_account)
             else:
-                await response(unregister, "删除失败\n可能原因：姓名与学号不匹配或使用的qq非注册时使用的qq")
+                await response(unregister, "删除失败\n可能原因：姓名与学号不匹配或使用的qq非注册时使用的qq", qq_account)
         except ValueError as e:
-            await response(unregister, str(e))
+            await response(unregister, str(e), qq_account)

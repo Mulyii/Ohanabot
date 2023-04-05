@@ -1,6 +1,6 @@
 from nonebot import on_command
 from nonebot.adapters.onebot.v11.message import Message
-from lib.dependclass import DependClass
+from lib.dependclass import DependClass, response
 from nonebot.params import Depends
 from lib.databaseclass import User, Mission, Problem
 from lib.databaseclass import MissionTable, UserTable, TaskTable, ProblemTable, DataBase
@@ -61,9 +61,9 @@ async def my_task_receiver(qq_account: DependClass = Depends(DependClass, use_ca
     try:
         user = get_user(qq_account)
         mission = get_mission(user)
-        await my_task.finish(Message(f"{mission.to_string()}\n需要完成的作业:\n{problems_to_string(mission_problems(mission.id))}(完成后才可进入下一任务)"))
+        await response(my_task, f"{mission.to_string()}\n需要完成的作业:\n{problems_to_string(mission_problems(mission.id))}(完成后才可进入下一任务)", qq_account)
     except ValueError as e:
-        await my_task.finish(Message(str(e)))
+        await response(my_task, str(e), qq_account)
 
 
 @my_task_finish.handle()
@@ -79,17 +79,17 @@ async def my_task_finish_receiver(qq_account: DependClass = Depends(DependClass,
         if flg:
             next_mission = mission.find_next_mission(mission.id)
             if next_mission == "无":
-                await my_task_finish.finish(Message("完成所有任务啦!"))
+                await response(my_task_finish, "完成所有任务啦!", qq_account)
                 return
             if next_mission == "ERROR":
-                await my_task_finish.finish(Message("出错!"))
+                await response(my_task_finish, "出错!", qq_account)
                 return
             user.mission_id = next_mission.id
             user_table = UserTable()
             user_table.update(user.id, user)
             print(user.to_string())
-            await my_task_finish.finish(Message("你已完成所有作业，已跳转至下一任务"))
+            await response(my_task_finish, "你已完成所有作业，已跳转至下一任务", qq_account)
         else:
-            await my_task_finish.finish(Message("还有作业未完成"))
+            await response(my_task_finish, "还有作业未完成", qq_account)
     except ValueError as e:
-        await my_task_finish.finish(Message(str(e)))
+        await response(my_task_finish, str(e), qq_account)
