@@ -4,9 +4,11 @@ from nonebot.adapters.onebot.v11.message import Message
 from lib.dependclass import DependClass
 from nonebot.params import Depends
 from lib.databaseclass import User
-from lib.databaseclass import DataBase
+from lib.databaseclass import UserTable
+from lib.config import register_help, unregister_help
 
 register = on_command("register")
+unregister = on_command("unregister")
 
 
 def split_to_pair(s: str) -> list:
@@ -15,45 +17,72 @@ def split_to_pair(s: str) -> list:
     return list(filter(lambda x: len(x) > 0, ret))
 
 
+async def response(receiver, mes: str, uid=None):
+    if uid is None:
+        await receiver.finish(Message(f'{mes}'))
+    else:
+        await receiver.finish(Message(f'[CQ:at,qq={uid}] {mes}'))
+
+
 @register.handle()
-async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
+async def register_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     print("register recieved")
     print(qq_account.uid, qq_account.nickname, qq_account.message)
-    response = ""
     if qq_account.type == "group":
-        response = "!!!仅私聊可用!!!"
-    elif len(qq_account.message) == 0 or qq_account.message == "help":
-        response = """
-命令格式:
-#register [姓名] [学号]
-姓名和学号用一个空格隔开(不要输入[])
-例：#register 张三 1234567890
-注意：一定要用真实姓名学号，若发现用虚假或别人的，会直接删除所有数据"""
-    else:
+        await response(register, "!!!仅私聊可用!!!", uid=qq_account.uid)
+        return
+    if len(qq_account.message) == 0 or qq_account.message == "help":
+        await response(register, register_help)
+        return
+    try:
+        db = UserTable()
+        if db.find_qq(qq_account.uid):
+            await response(register, "您已注册，若要再次注册，请输入#unregister注销账户")
+            return
+        ls: list = split_to_pair(qq_account.message)
+        if len(ls) != 2:
+            await response(register, "不合法的输入")
+            return
+        real_name, student_id = ls
+        if db.find_stuid(student_id):
+            await response(register, "该学生已注册")
+            return
         try:
-            db = DataBase()
-            if db.users_find_qq(qq_account.uid):
-                response = "您已注册，若要再次注册，请输入#unregister注销账户"
-            else:
-                ls: list = split_to_pair(qq_account.message)
-                if len(ls) != 2:
-                    response = "不合法的输入"
-                else:
-                    real_name, student_id = ls
-                    if db.users_find_stuid(student_id):
-                        response = "该学生已注册"
-                    else:
-                        try:
-                            print(f"real_name={real_name}, qq={qq_account.uid}, student_id={student_id}")
-                            user = User(real_name=real_name, qq=qq_account.uid, student_id=student_id)
-                            db.users_insert(user)
-                            response = f"""注册成功！！！
+            print(f"real_name={real_name}, qq={qq_account.uid}, student_id={student_id}")
+            user = User(real_name=real_name, qq=qq_account.uid, student_id=student_id)
+            db.insert(user)
+            await response(register, f"""注册成功！！！
 姓名: {user.real_name}
 qq号: {user.qq}
-学号: {user.student_id}"""
-                        except ValueError as e:
-                            print(e)
-                            response = "出错"
-        except pymysql.IntegrityError as e:
-            response = "数据库连接出错，请管理员报告错误"
-    await register.finish(Message(f'[CQ:at,qq={qq_account.uid}] {response}'))
+学号: {user.student_id}""")
+        except ValueError as e:
+            print(e)
+            await response(register, "出错")
+    except pymysql.IntegrityError as e:
+        await response(register, "数据库连接出错，请管理员报告错误")
+
+
+@unregister.handle()
+async def unregister_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
+    if qq_account.type == "group":
+        await response(unregister, "!!!仅限私聊!!!", qq_account.uid)
+        return
+    elif len(qq_account.message) == 0 or qq_account.message == "help":
+        await response(unregister, unregister_help)
+        return
+    else:
+        ls: list = split_to_pair(qq_account.message)
+        if len(ls) != 2:
+            await response(unregister, "不合法的输入")
+            return
+        real_name, student_id = ls
+        user = User(real_name=real_name, qq=qq_account.uid, student_id=student_id)
+        db = UserTable()
+        try:
+            is_delete = db.delete(user)
+            if is_delete > 0:
+                await response(unregister, "删除成功")
+            else:
+                await response(unregister, "删除失败\n可能原因：姓名与学号不匹配或使用的qq非注册时使用的qq")
+        except ValueError as e:
+            await response(unregister, str(e))

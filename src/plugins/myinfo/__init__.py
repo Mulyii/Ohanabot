@@ -1,11 +1,10 @@
 import pymysql
 from nonebot import on_command
 from nonebot.adapters.onebot.v11.message import Message
-from nonebot.adapters.onebot.v11 import GROUP_MEMBER
 from lib.dependclass import DependClass
 from nonebot.params import Depends
 from lib.databaseclass import User
-from lib.databaseclass import DataBase
+from lib.databaseclass import UserTable
 
 
 my_info = on_command("myinfo")
@@ -26,9 +25,9 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     if qq_account.type == "group":
         await response("!!!仅限私聊!!!", qq_account.uid)
     else:
-        db = DataBase()
+        db = UserTable()
         try:
-            info = db.users_find_qq(qq_account.uid)
+            info = db.find_qq(qq_account.uid)
             user = User(info["realname"], info["qq"], info["stuid"], info["codeforces"])
             await response(user.to_string() + "\n若要修改信息，可使用#sethelp来查询修改方法")
         except pymysql.IntegrityError as e:
@@ -55,8 +54,8 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     if qq_account.type == "group":
         await response("!!!仅限私聊!!!", qq_account.uid)
     else:
-        db = DataBase()
-        info = db.users_find_qq(qq_account.uid)
+        db = UserTable()
+        info = db.find_qq(qq_account.uid)
 
         if info == None:
             await response("该账号未注册，请先用#register help查看注册方法")
@@ -74,7 +73,7 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
 
         user = User(info["realname"], info["qq"], info["stuid"], info["codeforces"])
 
-        if db.users_update(info["userid"], user):
+        if db.update(info["userid"], user):
             await response("修改成功")
         else:
             await response("修改失败")

@@ -3,6 +3,7 @@ from nonebot.adapters.onebot.v11 import Bot, RequestEvent, FriendRequestEvent
 from lib.dependclass import DependClass
 from nonebot.params import Depends
 from nonebot.adapters.onebot.v11.message import Message
+from lib.config import welcome_word
 
 add_friend = on_request(priority=1, block=True)
 admin_qq = 915759345
@@ -20,6 +21,7 @@ async def handle_friend_request(bot: Bot, request_event: RequestEvent):
             await request_event.approve(bot, message[i + 1:])
             msg = f"已自动同意好友申请\nuid: {reqid}\ninfo:{message[i + 1:]}"
             await bot.send_private_msg(user_id=admin_qq, message=msg)
+            await bot.send_private_msg(user_id=reqid, message=welcome_word)
         else:
             await request_event.reject(bot)
 
