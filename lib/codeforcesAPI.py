@@ -4,10 +4,22 @@
 ############################################
 import requests
 import json
-from ..lib.databaseclass import Problem
+from lib.databaseclass import Problem
+import datetime
+from time import sleep
+
+last_time = datetime.datetime.now()
 
 
 def get_user_status(user_name: str): # 获取用户提交列表
+    # 设置时间间隔
+    global last_time
+    now_time = datetime.datetime.now()
+    while (now_time - last_time).seconds < 1:
+        sleep(0.5)
+        now_time = datetime.datetime.now()
+    last_time = datetime.datetime.now()
+
     url = f"https://codeforces.com/api/user.status?handle={user_name}"
     response = requests.get(url)
 
@@ -23,10 +35,6 @@ def get_user_status(user_name: str): # 获取用户提交列表
 def is_user_finished(user_name: str, prob: Problem): # 查找用户该题是否通过
     problems = get_user_status(user_name)
     for problem in problems:
-        if str(problem["contestId"]) + problem["index"] == prob.number:
+        if str(problem["contestId"]) + problem["index"] == prob.index:
             return True
     return False
-
-
-if __name__ == "__main__":
-    print(is_user_finished("WinterLove", Problem("", 0, "", "1801B")))
