@@ -18,6 +18,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 openai.organization = "org-m1n1DhFATSP7eMph8SSP9mRF"
+
 openai.api_key = "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"
 
 chat_switch = True

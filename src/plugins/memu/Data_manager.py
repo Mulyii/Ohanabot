@@ -43,12 +43,14 @@ class Data_manager(object):
             id.name for id in self.plugins_menu_list]
 
     async def get_menu_names(self):
-        menu_names = '<div align="center">\n <h1> 菜单 </h1> \n</div>'
+        menu_names = '<div align="center"><h1> 菜单 </h1></div>\n'
         id = 1
         for name in self.plugins_menu_list_name:
-            menu_names += f"* {id} .  **{name}**\n"
+            menu_names += f'<div align="center">\n'\
+                f'{id} .  <strong>{name}</strong>\n'\
+                f'</ul>\n'
             id += 1
-        return await md_to_pic(menu_names)
+        return await md_to_pic(menu_names, width=300)
 
     async def get_details(self, plugin_id):
         details: Message = f''
