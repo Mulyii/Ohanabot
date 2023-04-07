@@ -1,6 +1,8 @@
 import pymysql
 from lib.config import ConfigClass
 import datetime
+import time
+from typing import Optional
 
 class Problem: # 数据库题目类
     id: int
@@ -17,7 +19,7 @@ class Problem: # 数据库题目类
         self.url = url
 
     def to_string(self) -> str:
-        return f"{self.website}{self.name} {self.index}: {self.url}"
+        return f"{self.website}{self.index} {self.name}: {self.url}"
 
 class Score: # 数据库成绩类
     contest_id: int
@@ -36,14 +38,19 @@ class Score: # 数据库成绩类
 class Contest: # 数据库比赛类
     id: int
     name: str
-    time: str
-    duration: str
+    time: datetime
+    duration: time
+    site: str
 
-    def __init__(self, id: int, name: str, time: datetime, duration: datetime):
+    def __init__(self, id: int, name: str, time: datetime, duration: time, site: str):
         self.id = id
         self.name = name
-        self.datetime = datetime
+        self.time = time
         self.duration = duration
+        self.site = site
+
+    def to_string(self) -> str:
+        return f"比赛名: {self.name}\n开始时间: {self.time}\n时长: {self.duration}"
 
 class Mission: # 数据库任务类
     id: int = 0
@@ -55,19 +62,19 @@ class Mission: # 数据库任务类
         self.name = name
         self.description = description
 
-    def find_index(self, lines, mission_id: int):
+    def find_index(self, lines, mission_id: int):  #查找当前mission在序列中的位置
         for i, line in enumerate(lines):
             if line[0] == mission_id:
                 return i
         return -1
 
-    def calc_mission_rank(self, mission_id: int) -> str:
+    def calc_mission_rank(self, mission_id: int) -> str:  #查找mission的顺位，是第几个任务
         mission_table = MissionTable()
         lines = mission_table.find_all()
 
         return f"{self.find_index(lines, mission_id) + 1}/{len(lines)}"
 
-    def find_next_mission(self, mission_id: int):
+    def find_next_mission(self, mission_id: int):  #查找下一个任务，如果不存在则输出“无”
         mission_table = MissionTable()
         lines = mission_table.find_all()
 
@@ -104,7 +111,7 @@ class User: # 数据库用户类
     codeforces_id: str
     mission_id: int
 
-    def __init__(self, real_name: str, qq: str, student_id: str, mission_id:str ="",codeforces_id: str = "",  id: int = 0):
+    def __init__(self, real_name: str, qq: str, student_id: str, mission_id:int = 0,codeforces_id: str = "",  id: int = 0):
         self.id = id
         self.real_name = real_name
         self.mission_id = mission_id
@@ -137,6 +144,23 @@ qq号: {self.qq}
 Codeforces账号: {self.codeforces_id}
 当前的任务:{self.mission_id}"""
 
+class InteractionMessage:
+    sendtime: datetime
+    sender: str
+    reciever: str
+    type_name: str
+    come_from: str
+    message: str
+    command: str
+
+    def __init__(self, sendtime, sender, reciever, type_name, come_from, message, command):
+        self.sendtime = sendtime
+        self.sender = sender
+        self.reciever = reciever
+        self.type_name = type_name
+        self.come_from = come_from
+        self.message = message
+        self.command = command
 
 class DataBase:
     db = None # 数据库对象
@@ -150,9 +174,7 @@ class DataBase:
                                       passwd=con.database["password"],
                                       port=con.database["port"],
                                       db="robot")
-            print("connect success")
         except:
-            print("connect failure")
             raise ValueError("connect failure")
 
     def __del__(self):
@@ -166,9 +188,9 @@ class DataBase:
             self.db.commit()
             print(success_info)
             return cursor
-        except Exception as e:
+        except:
             self.db.rollback()
-            raise ValueError(failure_info + ": " + e)
+            raise ValueError(failure_info + ": ")
 
 class UserTable(DataBase):
     def __init__(self):
@@ -182,9 +204,13 @@ class UserTable(DataBase):
         sql = f"delete from users where realname='{user.real_name}' and qq='{user.qq}' and stuid='{user.student_id}'"
         return self.exec(sql, "In class UserTable function delete users delete failed").rowcount
 
-    def find_all(self): # users查询，返回所有实例
+    def find_all(self) -> list: # users查询，返回所有实例
         sql = f"select * from users"
-        return self.exec(sql, "In class UserTable function find_all").fetchall()
+        lines = self.exec(sql, "In class UserTable function find_all")
+        ret = []
+        for line in lines:
+            ret.append(User(id=line[0], real_name=line[1], qq=line[2], student_id=line[3], codeforces_id=line[4], mission_id=line[5]))
+        return ret
 
     def find_stuid(self, student_id: str): # users学号查询，返回所有实例
         sql = f"select * from users where stuid='{student_id}'"
@@ -196,7 +222,7 @@ class UserTable(DataBase):
         else:
             return None
 
-    def find_qq(self, qq: str): # users qq号查询，返回所有实例
+    def find_qq(self, qq: str) -> Optional[dict]: # users qq号查询，返回所有实例
         sql = f"select * from users where qq='{qq}'"
         cursor = self.exec(sql, "In class UserTable function find_qq users select failed")
         result = cursor.fetchone()
@@ -268,3 +294,45 @@ class TaskTable(DataBase):
     def find(self, id: int):
         sql = f"select * from tasks where problemid={id}"
         return self.exec(sql, "In class TaskTable function find task find error").fetchall()
+
+class InteractionTable(DataBase):
+    def __init__(self):
+        super(InteractionTable, self).__init__()
+
+    def insert(self, message: InteractionMessage):
+        sql = f"insert into interactions(sendtime, sender, receiver, typename, comefrom, message, command) values " + \
+              f"(\"{message.sendtime.strftime('%Y-%m-%d %H:%M:%S')}\", " + \
+              f" \"{message.sender}\"," + \
+              f" \"{message.reciever}\"," + \
+              f" \"{message.type_name}\"," + \
+              f" \"{message.come_from}\"," + \
+              f" \"{message.message}\"," + \
+              f" \"{message.command}\");"
+        print(sql)
+        self.exec(sql, "In class InteractionTable function insert error")
+
+class ContestTable(DataBase):
+    def __init__(self):
+        super(ContestTable, self).__init__()
+
+    def find_all(self) -> list:
+        sql = f"select * from contests"
+        lines = self.exec(sql)
+        ret = []
+        for line in lines:
+            ret.append(Contest(line[0], line[1], line[2], line[3], line[4]))
+
+        return ret
+
+class ScoreTable(DataBase):
+    def __init__(self):
+        super(ScoreTable, self).__init__()
+
+    def find(self, user_id: int) -> list:
+        sql = f"select * from scores where userid={user_id}"
+        lines = self.exec(sql)
+        ret = []
+        for line in lines:
+            ret.append(Score(line[0], line[1], line[2], line[3], line[4]))
+
+        return ret
