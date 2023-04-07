@@ -11,7 +11,7 @@ from time import sleep
 last_time = datetime.datetime.now()
 
 
-def get_user_status(user_name: str): # 获取用户提交列表
+def get_user_status(user_name: str):  # 获取用户提交列表
     # 设置时间间隔
     global last_time
     now_time = datetime.datetime.now()
@@ -32,7 +32,7 @@ def get_user_status(user_name: str): # 获取用户提交列表
     return ls
 
 
-def is_user_finished(user_name: str, prob: Problem): # 查找用户该题是否通过
+def is_user_finished(user_name: str, prob: Problem):  # 查找用户该题是否通过
     problems = get_user_status(user_name)
     for problem in problems:
         if str(problem["contestId"]) + problem["index"] == prob.index:
