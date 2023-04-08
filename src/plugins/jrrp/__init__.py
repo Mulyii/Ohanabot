@@ -15,7 +15,7 @@ __plugin_meta__ = PluginMetadata(
 #  创建储存文件
 if not os.path.exists("./data/id_lucknum.txt"):
     with open("./data/id_lucknum.txt", "w", encoding="utf_8") as f:
-        pass
+        f.write("date:")
 
 def luck_simple(num) :
     if num == 0 :

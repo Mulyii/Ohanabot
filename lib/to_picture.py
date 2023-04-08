@@ -7,7 +7,7 @@ def one_row(items: list[Any], is_header: bool) -> str:
     res = '<tr>\n'
     for item in items:
         res += f'<{label} align="center"> {item} </{label}>\n'
-    res += '</tr>'
+    res += '</tr>\n'
     return res
 
 # 传入表的标题， 表头， 表的内容， 图片的宽度（可选， 默认 500）
