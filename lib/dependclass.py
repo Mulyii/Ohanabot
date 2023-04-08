@@ -3,9 +3,10 @@
 # 过的字典
 ####################################
 import datetime
-from nonebot.adapters.onebot.v11.message import Message
+from nonebot.adapters.onebot.v11.message import Message, MessageSegment
 from nonebot.adapters.onebot.v11 import MessageEvent
 from lib.databaseclass import InteractionMessage, InteractionTable
+from typing import Union
 
 
 class DependClass:
@@ -42,12 +43,27 @@ class DependClass:
         interaction_table.insert(interaction)
 
 
-async def response(receiver, mes: str, depend: DependClass):
-    interaction = InteractionMessage(datetime.datetime.now(), 'bot', depend.uid,  depend.type, depend.come_from, mes, depend.title)
+async def response(receiver, mes: Union[str, bytes], depend: DependClass):  # receiver是触发信号源， mes是要回复的信息， depend就是触发时接受的DependClass变量z
+    insert_message = str(mes)
+    ls = insert_message.split("'")
+    insert_message = ls[0]
+    for i in range(1, len(ls)):
+        insert_message += '\\' + "'" + ls[i]
+    ls = insert_message.split('"')
+    insert_message = ls[0]
+    for i in range(1, len(ls)):
+        insert_message += '\\' + '"' + ls[i]
+    print(insert_message)
+    interaction = InteractionMessage(datetime.datetime.now(), 'bot', depend.uid,  depend.type, depend.come_from, insert_message, depend.title)
     interaction_table = InteractionTable()
     interaction_table.insert(interaction)
     if depend.type == "private":
-        await receiver.finish(Message(f'{mes}'))
+        if isinstance(mes, str):
+            await receiver.finish(Message(f'{mes}'))
+        elif isinstance(mes, bytes):
+            await receiver.finish(MessageSegment.image(mes))
     elif depend.type == "group":
-        await receiver.finish(Message(f'[CQ:at,qq={depend.uid}] {mes}'))
-
+        if isinstance(mes, str):
+            await receiver.finish(Message(f'[CQ:at,qq={depend.uid}] {mes}'))
+        elif isinstance(mes, bytes):
+            await receiver.finish(Message(f'[CQ:at,qq={depend.uid}]') + MessageSegment.image(mes))
