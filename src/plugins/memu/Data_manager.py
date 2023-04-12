@@ -53,12 +53,8 @@ class Data_manager(object):
         return await md_to_pic(menu_names, width=300)
 
     async def get_details(self, plugin_id):
-        details: Message = f''
-        if plugin_id <= len(self.plugins_menu_list_name):
-            plugin_item = self.plugins_menu_list[plugin_id - 1]
-            details = f'* **名称**：{plugin_item.name}\n'\
-                f'* **功能**：{plugin_item.description}\n' \
-                f'* **用法**：{plugin_item.usage}'
-        else:
-            details = f'请输入正确的编号\n'
+        plugin_item = self.plugins_menu_list[plugin_id - 1]
+        details = f'* **名称**：{plugin_item.name}\n'\
+            f'* **功能**：{plugin_item.description}\n' \
+            f'* **用法**：{plugin_item.usage}'
         return await md_to_pic(details)
