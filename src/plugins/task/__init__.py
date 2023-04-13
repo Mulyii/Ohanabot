@@ -5,12 +5,13 @@ from nonebot.params import Depends
 from lib.databaseclass import User, Mission, Problem
 from lib.databaseclass import MissionTable, UserTable, TaskTable, ProblemTable, DataBase
 from lib.codeforcesAPI import is_user_finished
+from typing import Optional
 
 my_task = on_command("mytask")
 my_task_finish = on_command("mytaskfinish")
 
 
-def mission_problems(mission_id: int) -> list:
+def mission_problems(mission_id: int) -> Optional[list]:
     try:
         db = DataBase()
         sql = f"select * from tasks, problems where tasks.missionid={mission_id} and tasks.problemid=problems.id"
@@ -24,7 +25,7 @@ def mission_problems(mission_id: int) -> list:
         return None
 
 
-def problems_to_string(lines: list) -> str:
+def problems_to_string(lines: Optional[list]) -> str:
     if lines is None:
         return "ERROR\n"
     if len(lines) == 0:

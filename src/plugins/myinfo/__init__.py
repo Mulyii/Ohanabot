@@ -19,8 +19,10 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     else:
         db = UserTable()
         try:
-            info = db.find_qq(qq_account.uid)
-            user = User(info["realname"], info["qq"], info["stuid"], info["codeforces"])
+            user = db.find_qq(qq_account.uid)
+            if user is None:
+                await response(my_info, "该账号未注册，请先用#register help查看注册方法", qq_account)
+                return
             await response(my_info, user.to_string() + "\n若要修改信息，可使用#sethelp来查询修改方法", qq_account)
         except pymysql.IntegrityError as e:
             print(e)
@@ -46,9 +48,9 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
         await response(set_info, "!!!仅限私聊!!!", qq_account)
     else:
         db = UserTable()
-        info = db.find_qq(qq_account.uid)
+        user = db.find_qq(qq_account.uid)
 
-        if info == None:
+        if user is None:
             await response(set_info, "该账号未注册，请先用#register help查看注册方法", qq_account)
             return
 
@@ -56,15 +58,13 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
         print(qq_account.message)
 
         if qq_account.title == "#setname":
-            info["realname"] = qq_account.message
+            user.real_name = qq_account.message
         elif qq_account.title == "#setstuid":
-            info["stuid"] = qq_account.message
+            user.student_id = qq_account.message
         elif qq_account.title == "#setcodeforces":
-            info["codeforces"] = qq_account.message
+            user.codeforces_id = qq_account.message
 
-        user = User(real_name=info["realname"], qq=info["qq"], student_id=info["stuid"], mission_id=info["missionid"], codeforces_id=info["codeforces"], id=info["userid"])
-
-        if db.update(info["userid"], user):
+        if db.update(user.id, user):
             await response(set_info, "修改成功", qq_account)
         else:
             await response(set_info, "修改失败", qq_account)

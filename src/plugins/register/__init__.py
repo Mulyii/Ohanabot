@@ -19,7 +19,7 @@ def split_to_pair(s: str) -> list:
 
 @register.handle()
 async def register_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
-    print("register recieved")
+    print("register received")
     print(qq_account.uid, qq_account.nickname, qq_account.message)
     if qq_account.type == "group":
         await response(register, "!!!仅私聊可用!!!", qq_account)
