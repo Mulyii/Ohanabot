@@ -95,11 +95,13 @@ class Mission: # 数据库任务类
 详细信息: \n{self.description}
 下一个任务: {next_mission.name if isinstance(next_mission, Mission) else next_mission}"""
 
-class task: # 数据库任务类
+class Task: # 数据库任务类
+    id: int
     mission_id: int
     problem_id: int
 
-    def __init__(self, mission_id: int, problem_id: int):
+    def __init__(self, id: int, mission_id: int, problem_id: int):
+        self.id = id
         self.mission_id = mission_id
         self.problem_id = problem_id
 
@@ -111,10 +113,9 @@ class User: # 数据库用户类
     codeforces_id: str
     mission_id: int
 
-    def __init__(self, real_name: str, qq: str, student_id: str, mission_id:int = 0,codeforces_id: str = "",  id: int = 0):
+    def __init__(self, real_name: str, qq: str, student_id: str,codeforces_id: str = "",  id: int = 0, mission_id: int = 0):
         self.id = id
         self.real_name = real_name
-        self.mission_id = mission_id
         if not self.check_qq(qq):
             raise ValueError("qq账号格式不正确")
         self.qq = qq
@@ -122,6 +123,7 @@ class User: # 数据库用户类
             raise ValueError("学号格式不正确")
         self.student_id = student_id
         self.codeforces_id = codeforces_id
+        self.mission_id = mission_id
 
     def check_qq(self, qq: str) -> bool: # 检查qq号格式是否正确
         for c in qq:
@@ -212,29 +214,37 @@ class UserTable(DataBase):
             ret.append(User(id=line[0], real_name=line[1], qq=line[2], student_id=line[3], codeforces_id=line[4], mission_id=line[5]))
         return ret
 
-    def find_stuid(self, student_id: str): # users学号查询，返回所有实例
+    def find_stuid(self, student_id: str) -> Optional[User]: # users学号查询，返回所有实例
         sql = f"select * from users where stuid='{student_id}'"
         cursor = self.exec(sql, "In class UserTable function find_stuid users select failed")
         result = cursor.fetchone()
         columns = [col[0] for col in cursor.description]
         if result:
-            return dict(zip(columns, result))
+            tmp = dict(zip(columns, result))
+            return User(id=tmp["userid"], real_name=tmp["realname"], qq=tmp["qq"], student_id=tmp["stuid"],
+                        codeforces_id=tmp["codeforces"], mission_id=tmp["missionid"])
         else:
             return None
 
-    def find_qq(self, qq: str) -> Optional[dict]: # users qq号查询，返回所有实例
+    def find_qq(self, qq: str) -> Optional[User]: # users qq号查询，返回所有实例
         sql = f"select * from users where qq='{qq}'"
         cursor = self.exec(sql, "In class UserTable function find_qq users select failed")
         result = cursor.fetchone()
         columns = [col[0] for col in cursor.description]
         if result:
-            return dict(zip(columns, result))
+            tmp = dict(zip(columns, result))
+            return User(id=tmp["userid"], real_name=tmp["realname"], qq=tmp["qq"], student_id=tmp["stuid"],
+                        codeforces_id=tmp["codeforces"], mission_id=tmp["missionid"])
         else:
             return None
 
-    def find_realname(self, real_name: str): # users姓名查询，返回所有实例
+    def find_realname(self, real_name: str) -> list[User]: # users姓名查询，返回所有实例
         sql = f"select * from users where realname='{real_name}'"
-        return self.exec(sql, "In class UserTable function find_realname users select failed").fetchall()
+        ret = []
+        lines = self.exec(sql, "In class UserTable function find_realname users select failed").fetchall()
+        for line in lines:
+            ret.append(User(id=line[0], real_name=line[1], qq=line[2], student_id=line[3], codeforces_id=line[4], mission_id=line[5]))
+        return ret
 
     def update(self, id: int, user: User): # users更新
         sql = f"update users set realname='{user.real_name}', qq='{user.qq}', stuid='{user.student_id}', codeforces='{user.codeforces_id}', missionid={user.mission_id} \
@@ -257,19 +267,24 @@ class MissionTable(DataBase):
         sql = f"update missions set missionname='{mission.name}', description='{mission.description}, nextmissionid={mission.next_id}' where missionid={id};"
         return self.exec(sql, "In class MissionTable function update mission update error").rowcount > 0
 
-    def find(self, id: int) -> dict:
+    def find(self, id: int) -> Mission:
         sql = f"select * from missions where missionid={id}"
         cursor = self.exec(sql, "In class MissinTable function find mission find error")
         result = cursor.fetchone()
         columns = [col[0] for col in cursor.description]
         if result:
-            return dict(zip(columns, result))
+            tmp = dict(zip(columns, result))
+            return Mission(id=tmp["mission"], name=tmp["missionname"], description=tmp["description"])
         else:
             return None
 
-    def find_all(self) -> tuple:
+    def find_all(self) -> list[Mission]:
         sql = f"select * from missions"
-        return self.exec(sql, "In class MissionTable function find_all mission find error").fetchall()
+        lines = self.exec(sql, "In class MissionTable function find_all mission find error").fetchall()
+        ret = []
+        for line in lines:
+            ret.append(Mission(id=line[0], name=line[1], description=line[2]))
+        return ret
 
 class ProblemTable(DataBase):
     def __init__(self):
@@ -281,19 +296,27 @@ class ProblemTable(DataBase):
 
     def delete(self, problem: Problem):
         sql = f"delete from problems where problemid={problem.id}"
-        return self.exec(sql, "In class ProblemTable function delete problem delete error")
+        return self.exec(sql, "In class ProblemTable function delete problem delete error").rowcount;
 
-    def find(self, id: int):
+    def find(self, id: int) -> list[Problem]:
         sql = f"select * from problems where problemid={id}"
-        return self.exec(sql, "In class ProblemTable function find problem find error").fetchall()
+        lines = self.exec(sql, "In class ProblemTable function find problem find error").fetchall()
+        ret = []
+        for line in lines:
+            ret.append(Problem(id=line[0], name=line[1], website=line[2], index=line[3], url=line[4]))
+        return ret
 
 class TaskTable(DataBase):
     def __init__(self):
         super(TaskTable, self).__init__()
 
-    def find(self, id: int):
+    def find(self, id: int) -> list[Task]:
         sql = f"select * from tasks where problemid={id}"
-        return self.exec(sql, "In class TaskTable function find task find error").fetchall()
+        ret = []
+        lines = self.exec(sql, "In class TaskTable function find task find error").fetchall()
+        for line in lines:
+            ret.append(Task(id=line[0], mission_id=line[1], problem_id=line[2]))
+        return ret
 
 class InteractionTable(DataBase):
     def __init__(self):
@@ -315,7 +338,7 @@ class ContestTable(DataBase):
     def __init__(self):
         super(ContestTable, self).__init__()
 
-    def find_all(self) -> list:
+    def find_all(self) -> list[Contest]:
         sql = f"select * from contests"
         lines = self.exec(sql)
         ret = []
@@ -328,7 +351,7 @@ class ScoreTable(DataBase):
     def __init__(self):
         super(ScoreTable, self).__init__()
 
-    def find(self, user_id: int) -> list:
+    def find(self, user_id: int) -> list[Score]:
         sql = f"select * from scores where userid={user_id}"
         lines = self.exec(sql)
         ret = []
