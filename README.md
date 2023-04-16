@@ -149,6 +149,7 @@
 
 
 ## QQ端
+
 **个人信息注册修改**
 
 register, myinfo
@@ -184,6 +185,8 @@ task
 ~~**OpenAi**~~
 
 **自我测评**
+
+前提：创建账号
 
 指令集：#myteststart, #mytestsumbit， #mytestnext
 
@@ -227,13 +230,57 @@ task
 
 **自建比赛**
 
-指令集: #createcontest, #addcontest, #contestresualt, #deletecontest, #mycontest
+前提：创建账号
+
+指令集: #createcontest, #addcontest, #contestresualt, #deletecontest, #mycontest， #mycontestsubmit
 
 createcontest:
 
 创建比赛，每人同时只能创建一场比赛。
 
-附加命令[datetime] [duration] [rating range]
+附加命令[date] [time] [duration] [rating range]
+
+例 $\#createcontest\ 2023.04.16\ 14:00\ 2:00\ [800,1900]$
+
+若创建成功，回复比赛id
+
+若输入不合法，则返回创建失败
+
+addcontest:
+
+后面跟一个比赛ID
+
+不能重复添加，没有人数上限
+
+不存在返回不存在
+
+contestresualt：
+
+后面跟比赛ID
+
+返回比赛结果排名图片
+
+deletecontest：
+
+删除比赛，仅比赛创建者可以删除。
+
+mycontest：
+
+查询自己报名的比赛信息。
+
+返回图片。
+
+
+
+比赛开始时， 随机抽取题目，生成图片私聊发送参赛用户。
+
+用户通过mycontestsubmit [题目编号] [代码] 提交代码。
+
+返回题目通过情况，按照区域赛标准，只提供错误信息，不提供错误点。
+
+时间到，结束比赛，计算分数排名，存入数据库。
+
+
 
 ## 任务分配
 
