@@ -183,8 +183,57 @@ task
 
 ~~**OpenAi**~~
 
+**自我测评**
 
+指令集：#myteststart, #mytestsumbit， #mytestnext
 
+题目数量：n未定，测试用两题
+
+题目分类：数据结构，图论，数学，动态规划
+
+评测方式：
+
+> 随机选择n道题目，难度范围视具体情况而定，建议（800-1900）。
+>
+> 将题目转换成图片，隐藏题目名，发送给测评人。 （需要一个函数， 传入cf题目编号，返回该题目符合要求的图片）
+>
+> 测评人通过#mysubmit[空格]代码进行提交，提交后返回题目测评信息。
+>
+> 当前题目通过后， 可以通过#mytestnext继续测评（考虑到不一定有人有很长的连续时间测评，所以允许分段测评）。
+>
+> 时间限制：1h
+
+评分方式：
+
+> 获取题目的分类，将分类归类为上面给出的四个大类，更具每一分类分别计算。
+>
+> 题目在给出rating区间内均匀分布。
+>
+> 最后根据题目难度和对应题目难度的通过率，建立笛卡尔坐标系。
+>
+> 先进行一个理想的假设$\exist x,\; st.\;\forall y\le x\;f(x) = 1\;and\;\forall y>x\;f(x)=0$
+>
+> 那么这个$x$就是该学生的rating。
+>
+> 不过实际往往不是如此，但是有一个性质:
+>
+> $\exists L\le R,\; st.\; \forall x <=L,f(x)=1,\forall x'>=R, f(x)=0$
+>
+> 令$l = L_{max}, r = R_{min}$，这里暂时没有很好的计算方式的想法，暂定
+>
+> $score_{t} = \sum \limits_{i = l}^{r} if_{t}(i)$
+>
+> $score = average(score_i)$
+
+**自建比赛**
+
+指令集: #createcontest, #addcontest, #contestresualt, #deletecontest, #mycontest
+
+createcontest:
+
+创建比赛，每人同时只能创建一场比赛。
+
+附加命令[datetime] [duration] [rating range]
 
 ## 任务分配
 
