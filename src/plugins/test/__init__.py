@@ -8,7 +8,7 @@ import pymysql as sql
 
 
 test = on_command(
-    "#test",
+    "test",
     aliases={},
     priority=1,
     block=True,

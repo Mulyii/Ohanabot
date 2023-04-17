@@ -52,6 +52,6 @@ async def _(arg: Message = CommandArg()):
     if not msg:
         await menu.finish(MessageSegment.image(await data_manager.get_menu_names()))
     elif not msg.isdigit() or eval(msg) > len(data_manager.plugins_menu_list) or eval(msg) <= 0:
-        await menu.finish(f"请输入阿拉伯数字{1}~{len(data_manager.plugins_menu_list)}以获取菜单的详细信息")
+        await menu.finish(f"请输入help + 阿拉伯数字{1}~{len(data_manager.plugins_menu_list)}以获取菜单的详细信息")
     else:
         await menu.finish(MessageSegment.image(await data_manager.get_details(eval(msg))))

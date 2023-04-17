@@ -22,8 +22,8 @@ task_help = """123"""
 class ConfigClass: # 数据库配置类
     def __init__(self):
         self.database = {
-            "host": "localhost",
+            "host": "47.115.207.251",
             "user": "root",
-            "password": "root",
+            "password": "ACMclub2021",
             "port": 3306
         }
