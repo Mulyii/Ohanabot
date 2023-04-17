@@ -31,14 +31,12 @@ def get_user_status(user_name: str):  # 获取用户提交列表
             ls.append(submission["problem"])
     return ls
 
-
 def is_user_finished(user_name: str, prob: Problem):  # 查找用户该题是否通过
     problems = get_user_status(user_name)
     for problem in problems:
         if str(problem["contestId"]) + problem["index"] == prob.index:
             return True
     return False
-
 
 def get_unsorted_problem_list() -> list:#得到未排序过的题目列表
     global last_time
@@ -92,6 +90,7 @@ def set_mmax(x):
     file_obj.close()
     f = open('data/difficulty.txt', 'w')
     f.write(mmin + " " + mmax)
+    
 def output_mmin():
     mmin = 0
     mmax = 0
@@ -220,6 +219,7 @@ def output_random_problem_url():#输出题目url
             json.dump(data, f)
 
         return url
+    
 def update_random_problem_url():#难度更新时更新题目
     global last_time
     now_time = datetime.datetime.now()
@@ -252,6 +252,7 @@ def update_random_problem_url():#难度更新时更新题目
         json.dump(data, f)
 
         return url
+    
 # 这里没有将姓名与rating相关，后续可以继续调用
 def get_user_rating():#得到数据库所有用户的rating以及codeforceid
     global last_time
@@ -282,6 +283,7 @@ def get_user_rating():#得到数据库所有用户的rating以及codeforceid
         return sorted_user_rating
     except:
         print("数据库连接出错！")
+        
 def get_cf_user_rating(user_id):#已知id得到单个用户的rating
     url = f"https://codeforces.com/api/user.rating?handle={user_id}"
     response = requests.get(url)
