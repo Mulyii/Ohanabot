@@ -7,16 +7,21 @@ import json
 from lib.databaseclass import Problem
 import datetime
 from time import sleep
+import random
+from lib.databaseclass import UserTable
 
+#上次调用api的时间
 last_time = datetime.datetime.now()
+# 难度上限与难度下限
+# difficulty_min = 1200
+# difficulty_max = 1600
 
-
-def get_user_status(user_name: str):  # 获取用户提交列表
+def get_user_status(user_name: str): # 获取用户提交列表
     # 设置时间间隔
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 1:
-        sleep(0.5)
+    while (now_time - last_time).seconds < 2:
+        sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
 
@@ -31,7 +36,7 @@ def get_user_status(user_name: str):  # 获取用户提交列表
             ls.append(submission["problem"])
     return ls
 
-def is_user_finished(user_name: str, prob: Problem):  # 查找用户该题是否通过
+def is_user_finished(user_name: str, prob: Problem) -> bool: # 查找用户该题是否通过
     problems = get_user_status(user_name)
     for problem in problems:
         if str(problem["contestId"]) + problem["index"] == prob.index:
@@ -61,7 +66,7 @@ def split_to_pair(s: str) -> list:
     [x.strip() for x in ret]
     return list(filter(lambda x: len(x) > 0, ret))
 
-def set_mmin(x):
+def set_mmin(x):#设置最小难度
     # global difficulty_min
     # difficulty_min = x
     mmin = 0
@@ -76,7 +81,7 @@ def set_mmin(x):
     f = open('data/difficulty.txt', 'w')
     f.write(mmin + " " + mmax)
 
-def set_mmax(x):
+def set_mmax(x):#设置最大难度
     # global difficulty_max
     # difficulty_max = x
     mmin = 0
@@ -90,8 +95,7 @@ def set_mmax(x):
     file_obj.close()
     f = open('data/difficulty.txt', 'w')
     f.write(mmin + " " + mmax)
-    
-def output_mmin():
+def output_mmin():#返回最小难度
     mmin = 0
     mmax = 0
     with open("data/difficulty.txt", encoding='utf-8') as file_obj:
@@ -102,7 +106,7 @@ def output_mmin():
         mmax = number[1]
     return int(mmin)
 
-def output_mmax():
+def output_mmax():#返回最大难度
     mmin = 0
     mmax = 0
     with open("data/difficulty.txt", encoding='utf-8') as file_obj:
@@ -113,7 +117,8 @@ def output_mmax():
         mmax = number[1]
     return int(mmax)
 
-def get_problem_list():#得到符合条件的题目列表
+
+def get_problem_list(difficulty_min, difficulty_max):#得到符合条件的题目列表
     global last_time
     now_time = datetime.datetime.now()
     while (now_time - last_time).seconds < 2:
@@ -123,16 +128,10 @@ def get_problem_list():#得到符合条件的题目列表
 
     API_BASE_URL = "https://codeforces.com/api/"
     url = API_BASE_URL + "problemset.problems"
-    with open("data/difficulty.txt", encoding='utf-8') as file_obj:
-        lines = file_obj.readlines()
-        list = lines[0]
-        # print(list)
-        number = split_to_pair(str(list))
-        difficulty_min = int(number[0])
-        difficulty_max = int(number[1])
 
     print(difficulty_min, difficulty_max)
-
+    # print(output_mmin())
+    # print(output_mmax())
     # 向 API 发送查询请求
     response = requests.get(url)
     # 解析响应数据，获取题目列表
@@ -204,7 +203,7 @@ def output_random_problem_url():#输出题目url
         url = "https://codeforces.com/problemset/problem/{}/{}/".format(selected_problem_id[0], selected_problem_id[1])
         return url
     else:
-        filtered_problems = get_problem_list()
+        filtered_problems = get_problem_list(output_mmin(), output_mmin())
 
         problem = random.choice(filtered_problems)
 
@@ -219,7 +218,6 @@ def output_random_problem_url():#输出题目url
             json.dump(data, f)
 
         return url
-    
 def update_random_problem_url():#难度更新时更新题目
     global last_time
     now_time = datetime.datetime.now()
@@ -236,23 +234,19 @@ def update_random_problem_url():#难度更新时更新题目
 
     # 检查上次选择的题目时间是否在今天
     today = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    if last_selected_time >= today:
+        # 如果上次选择的题目时间在今天，则使用上次选择的题目
+        selected_problem_id = last_selected_problem_id
+        url = "https://codeforces.com/problemset/problem/{}/{}/".format(selected_problem_id[0], selected_problem_id[1])
+        return url
+    else:
+        filtered_problems = get_problem_list(output_mmin(), output_mmin())
 
-    filtered_problems = get_problem_list()
+        problem = random.choice(filtered_problems)
 
-    # 随机选择一道题目
-    problem = random.choice(filtered_problems)
-
-    url = "https://codeforces.com/problemset/problem/{}/{}/".format(problem[0], problem[1])
-    # 保存选择的题目 ID 和选择时间
-    with open("data/selected_problem.json", "w") as f:
-        data = {
-            "problem_id": problem,
-            "selected_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        json.dump(data, f)
+        url = "https://codeforces.com/problemset/problem/{}/{}/".format(problem[0], problem[1])
 
         return url
-    
 # 这里没有将姓名与rating相关，后续可以继续调用
 def get_user_rating():#得到数据库所有用户的rating以及codeforceid
     global last_time
@@ -283,7 +277,6 @@ def get_user_rating():#得到数据库所有用户的rating以及codeforceid
         return sorted_user_rating
     except:
         print("数据库连接出错！")
-        
 def get_cf_user_rating(user_id):#已知id得到单个用户的rating
     url = f"https://codeforces.com/api/user.rating?handle={user_id}"
     response = requests.get(url)
@@ -302,3 +295,4 @@ def sort_cf_user_rating(user_ids):#对rating进行排序
             user_ratings.append((user_id, rating))
     sorted_user_ratings = sorted(user_ratings, key=lambda x: x[1], reverse=True)
     return sorted_user_ratings
+
