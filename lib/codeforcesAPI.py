@@ -132,6 +132,7 @@ def get_problem_list(difficulty_min, difficulty_max):#得到符合条件的题�
     print(difficulty_min, difficulty_max)
     # print(output_mmin())
     # print(output_mmax())
+    
     # 向 API 发送查询请求
     response = requests.get(url)
     # 解析响应数据，获取题目列表
@@ -146,9 +147,7 @@ def get_problem_list(difficulty_min, difficulty_max):#得到符合条件的题�
 
     # # 筛选符合条件的题目
     filtered_problems = []
-    # for problem_id, difficulty in problem_difficulties.items():
-    #     if difficulty_min <= difficulty <= difficulty_max:
-    #         filtered_problems.append(problem_id)
+    
     tagged_problems = {"dp":[],"math":[],"data structures":[],"graphs":[]}
     for problem in problems:
         problem_id = problem["contestId"], problem["index"]
@@ -157,14 +156,14 @@ def get_problem_list(difficulty_min, difficulty_max):#得到符合条件的题�
             problem_tags = problem["tags"]
             if problem_difficulty >= difficulty_min and problem_difficulty <= difficulty_max:
                 tmp = []
-                for i in problem_id:
-                    tmp.append(i)
-                for i in problem_tags:
-                    if i == "dp":
+                for son_data in problem_id:
+                    tmp.append(son_data)
+                for tags in problem_tags:
+                    if tags == "dp":
                         tagged_problems["dp"].append(tmp)
-                    if i == "math":
+                    if tags == "math":
                         tagged_problems["math"].append(tmp)
-                    if i == "graphs":
+                    if tags == "graphs":
                         tagged_problems["math"].append(tmp)
                     else:
                         tagged_problems["data structures"].append(tmp)
@@ -176,8 +175,8 @@ def get_problem_list(difficulty_min, difficulty_max):#得到符合条件的题�
             if problem_difficulty >= difficulty_min and problem_difficulty <= difficulty_max:
                 # tagged_problems[problem_id] = problem_tags
                 tmp = []
-                for i in problem_id:
-                    tmp.append(i)
+                for son_data in problem_id:
+                    tmp.append(son_data)
                 tmp.append(problem_tags)
                 filtered_problems.append(tmp)
     print(tagged_problems)
