@@ -10,16 +10,18 @@ class Problem: # 数据库题目类
     website: str
     index: str
     url: str
+    tags: list[str]
 
-    def __init__(self, id: int, name: str, website: str, index: str, url: str):
+    def __init__(self, id: int, name: str, website: str, index: str, url: str, tags: Optional[list] = None):
         self.id = id
         self.name = name
         self.website = website
         self.index = index
         self.url = url
+        self.tags = tags
 
     def to_string(self) -> str:
-        return f"{self.website}{self.index} {self.name}: {self.url}"
+        return f"{self.website}{self.index} {self.name}: {self.url}\ntags: {','.join(self.tags)}"
 
 class Score: # 数据库成绩类
     contest_id: int
@@ -359,3 +361,21 @@ class ScoreTable(DataBase):
             ret.append(Score(line[0], line[1], line[2], line[3], line[4]))
 
         return ret
+
+__all__ = {
+    "User",
+    "Task",
+    "Score",
+    "Contest",
+    "Problem",
+    "Mission",
+    "DataBase",
+    "UserTable",
+    "TaskTable",
+    "ScoreTable",
+    "MissionTable",
+    "ProblemTable",
+    "ContestTable",
+    "InteractionTable",
+    "InteractionMessage"
+}
