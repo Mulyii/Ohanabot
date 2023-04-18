@@ -144,13 +144,44 @@ def get_problem_list(difficulty_min, difficulty_max):#得到符合条件的题�
         if "rating" in problem:
             problem_difficulties[problem_id] = problem["rating"]
 
-    # 筛选符合条件的题目
+    # # 筛选符合条件的题目
     filtered_problems = []
-    for problem_id, difficulty in problem_difficulties.items():
-        if difficulty_min <= difficulty <= difficulty_max:
-            filtered_problems.append(problem_id)
-
-    return filtered_problems
+    # for problem_id, difficulty in problem_difficulties.items():
+    #     if difficulty_min <= difficulty <= difficulty_max:
+    #         filtered_problems.append(problem_id)
+    tagged_problems = {"dp":[],"math":[],"data structures":[],"graphs":[]}
+    for problem in problems:
+        problem_id = problem["contestId"], problem["index"]
+        if "rating" in problem:
+            problem_difficulty = problem["rating"]
+            problem_tags = problem["tags"]
+            if problem_difficulty >= difficulty_min and problem_difficulty <= difficulty_max:
+                tmp = []
+                for i in problem_id:
+                    tmp.append(i)
+                for i in problem_tags:
+                    if i == "dp":
+                        tagged_problems["dp"].append(tmp)
+                    if i == "math":
+                        tagged_problems["math"].append(tmp)
+                    if i == "graphs":
+                        tagged_problems["math"].append(tmp)
+                    else:
+                        tagged_problems["data structures"].append(tmp)
+    for problem in problems:
+        problem_id = problem["contestId"], problem["index"]
+        if "rating" in problem:
+            problem_difficulty = problem["rating"]
+            problem_tags = problem["tags"]
+            if problem_difficulty >= difficulty_min and problem_difficulty <= difficulty_max:
+                # tagged_problems[problem_id] = problem_tags
+                tmp = []
+                for i in problem_id:
+                    tmp.append(i)
+                tmp.append(problem_tags)
+                filtered_problems.append(tmp)
+    print(tagged_problems)
+    return filtered_problems, tagged_problems
 
 def get_last_problem_time():#得到上一次更新每日一题的时间
     global last_time
@@ -203,7 +234,7 @@ def output_random_problem_url():#输出题目url
         url = "https://codeforces.com/problemset/problem/{}/{}/".format(selected_problem_id[0], selected_problem_id[1])
         return url
     else:
-        filtered_problems = get_problem_list(output_mmin(), output_mmin())
+        filtered_problems, tagged_problems = get_problem_list(output_mmin(), output_mmin())
 
         problem = random.choice(filtered_problems)
 
@@ -240,7 +271,7 @@ def update_random_problem_url():#难度更新时更新题目
         url = "https://codeforces.com/problemset/problem/{}/{}/".format(selected_problem_id[0], selected_problem_id[1])
         return url
     else:
-        filtered_problems = get_problem_list(output_mmin(), output_mmin())
+        filtered_problems, tagged_problems = get_problem_list(output_mmin(), output_mmin())
 
         problem = random.choice(filtered_problems)
 
