@@ -397,14 +397,25 @@ class TestTable(DataBase):
         return self.exec(sql, "In class TestTable function update test update error").rowcount > 0
 
     def find(self, id: int) -> Optional[Test]:
-        sql = "select * from tests"
-        lines = self.exec(sql, "In class TestTable function find test update error").fetchall()
+        sql = f"select * from tests where id = {id}"
+        lines = self.exec(sql, "In class TestTable function find test find error").fetchall()
         print(lines)
         if len(lines) == 0:
             return None
         line = lines[0]
         print(line)
         return Test(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7])
+
+    def find_all(self) -> Optional[list[Test]]:
+        sql = "select * from tests"
+        lines = self.exec(sql, "In class TestTable function find_all test find error").fetchall()
+        print(lines)
+        if len(lines) == 0:
+            return None
+        ret = []
+        for line in lines:
+            ret.append(Test(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7]))
+        return ret
 
 __all__ = {
     "User",
