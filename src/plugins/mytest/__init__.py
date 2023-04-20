@@ -9,12 +9,13 @@ from lib.config import ConfigClass
 from datetime import datetime, timedelta
 import random
 from nonebot.plugin import PluginMetadata
+from lib.to_picture import table_to_pic
 
 
 __plugin_meta__ = PluginMetadata(
     name="自我测试(mytest)",
     description="自我测评",
-    usage="输入#myteststart开始测评, 输入#mytestfinish结束测评，返回题目完成情况",
+    usage="输入#myteststart开始测评, 输入#mytestfinish结束测评，返回题目完成情况， 输入#mytestresult查看评测结果",
     extra={
         "unique_name": "mytest",
         "author": "xcw <915759345@qq.com>",
@@ -24,6 +25,8 @@ __plugin_meta__ = PluginMetadata(
 
 mytest_start = on_command("myteststart", aliases={"开始测评"})
 mytest_finish = on_command("mytestfinish", aliases={"结束测评"})
+mytest_result = on_command("mytestresult", aliases={"测评结果"})
+alltest_result = on_command("alltestresult", aliases={"所有测评结果"})
 
 config = ConfigClass()
 user_table = UserTable()
@@ -40,9 +43,12 @@ async def mytest_start_receiver(qq_account: DependClass = Depends(DependClass, u
     if user.codeforces_id == "":
         await response(mytest_start, "请设置你的Codeforces账号名", qq_account)
         return
+
     test = test_table.find(user.id)
     if test is None:
         test_table.insert(Test(user.id, 0, 0, 0, 0, 0, 0, 0))
+    test = test_table.find(user.id)
+    difficult_min = min(test.math, test.dp, test.other, test.graphic, test.strings, test.geometry, test.structure)
     save_file = "./data/" + str(qq_account.uid) + "info.txt";
     if not os.path.exists(save_file):
         file = open(save_file, 'w')
@@ -53,7 +59,7 @@ async def mytest_start_receiver(qq_account: DependClass = Depends(DependClass, u
         await response(mytest_start, "你的上一个测试还没有完成, 请输入#mytestfinish结束上次测试", qq_account)
         return
     print("i1")
-    difficulty = rating_func(random.randint(config.test["minrating"], config.test["maxrating"]))
+    difficulty = rating_func(random.randint(max(config.test["minrating"], difficult_min), config.test["maxrating"]))
     problem = random_rating_problem(difficulty)
 
     end_time = datetime.now() + timedelta(hours=1)
@@ -121,3 +127,41 @@ async def mytest_finish_receiver(qq_account: DependClass = Depends(DependClass, 
 
     relist = ["完成", "未完成", "未在规定时间内完成"]
     await response(mytest_finish, f"上一个任务已结束，你的任务状态为{relist[state]}", qq_account)
+
+@mytest_result.handle()
+async def mytest_result_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
+    user = user_table.find_qq(qq_account.uid)
+    if user is None:
+        await response(mytest_result, "请先注册", qq_account)
+        return
+    if user.codeforces_id == "":
+        await response(mytest_result, "请设置你的Codeforces账号名", qq_account)
+        return
+
+    test = test_table.find(user.id)
+    if test is None:
+        await response(mytest_result, "你还未参与过测评", qq_account)
+        return
+
+    img = await table_to_pic(title=f"{qq_account.nickname}的测评结果",
+                             headers=["数学", "杂耍", "数据结构", "动态规划", "平面几何", "图论", "字符串"],
+                             table=[[test.math, test.other, test.structure, test.dp, test.geometry, test.graphic, test.strings]],
+                             w=800)
+    await response(mytest_result, img, qq_account)
+
+@alltest_result.handle()
+async def alltest_result_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
+    tests = test_table.find_all()
+    users = user_table.find_all()
+    title = "所有用户测评情况"
+    headers = ["姓名", "数学", "杂耍", "数据结构", "动态规划", "平面几何", "图论", "字符串"]
+    table = []
+    for test in tests:
+        for user in users:
+            if user.id == test.user_id:
+                nuser = user
+                break
+        table.append([nuser.real_name, test.math, test.other, test.structure, test.dp, test.geometry, test.graphic, test.strings])
+
+    img = await table_to_pic(title=title, headers=headers, table=table, w=800)
+    await response(alltest_result, img, qq_account)
