@@ -1,14 +1,25 @@
 import pymysql
 from nonebot import on_command
 from nonebot.adapters.onebot.v11.message import Message
+from nonebot.plugin import PluginMetadata
 from lib.dependclass import DependClass, response
 from nonebot.params import Depends
 from lib.databaseclass import User
 from lib.databaseclass import UserTable
 
+__plugin_meta__ = PluginMetadata(
+    name="个人信息修改查看(myinfo, sethelp, setname, setstuid, setcodeforces)",
+    description="查看和修改个人信息",
+    usage="输入#myinfo查看个人信息\n输入#sethelp查看如何修改个人信息",
+    extra={
+        "unique_name": "myinfo",
+        "author": "xcw <915759345@qq.com>",
+        "version": "1.0.0"
+    }
+)
 
-my_info = on_command("myinfo")
-set_help = on_command("sethelp")
+my_info = on_command("myinfo", aliases={"我的信息"})
+set_help = on_command("sethelp", aliases={"修改信息帮助"})
 set_info = on_command("setname", aliases={"setstuid", "setcodeforces"})
 
 
