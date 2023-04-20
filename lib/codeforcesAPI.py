@@ -17,12 +17,13 @@ last_time = datetime.datetime.now()
 # 难度上限与难度下限
 # difficulty_min = 1200
 # difficulty_max = 1600
+delay_time = 3
 
 def get_user_status(user_name: str): # 获取用户提交列表
     # 设置时间间隔
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -31,6 +32,7 @@ def get_user_status(user_name: str): # 获取用户提交列表
     response = requests.get(url)
 
     data = json.loads(response.text)
+    print(data)
     submissions = data["result"]
     ls = []
     for submission in submissions:
@@ -48,7 +50,7 @@ def is_user_finished(user_name: str, prob: Problem) -> bool: # 查找用户该�
 def get_unsorted_problem_list() -> list:#得到未排序过的题目列表
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -122,7 +124,7 @@ def output_mmax():#返回最大难度
 def get_detailed_list(difficulty_min, difficulty_max,chosen_tag):#给出tag，难度，返回题目的序号，可以调用chosen_problem函数返回url
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -181,7 +183,7 @@ def get_detailed_list(difficulty_min, difficulty_max,chosen_tag):#给出tag，�
 def get_problem_list(difficulty_min, difficulty_max):#得到符合条件的题目列表
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -245,7 +247,7 @@ def get_problem_list(difficulty_min, difficulty_max):#得到符合条件的题�
 def get_last_problem_time():#得到上一次更新每日一题的时间
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -268,7 +270,7 @@ def choose_random_problem(problems):# 从题目列表中随机选择一道题目
 def output_random_problem_url():#输出题目url
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -305,7 +307,7 @@ def output_random_problem_url():#输出题目url
 def update_random_problem_url():#难度更新时更新题目
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -336,7 +338,7 @@ def update_random_problem_url():#难度更新时更新题目
 def get_user_rating():#得到数据库所有用户的rating以及codeforceid
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -386,7 +388,7 @@ def random_rating_problem(difficulty: int) -> Problem:
     # difficulty = 1000
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -440,7 +442,7 @@ def random_rating_problem(difficulty: int) -> Problem:
 def ask_for_problem_tag(problem_id) -> list[str]:
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -525,7 +527,7 @@ def get_datetime_sptr():
 def check_submission(uid : str, problem_id : list, start_datetime=None, end_datetime=None) -> bool:
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
@@ -576,7 +578,7 @@ def check_submission(uid : str, problem_id : list, start_datetime=None, end_date
 def get_recent_contests(max_duration=2592000):
     global last_time
     now_time = datetime.datetime.now()
-    while (now_time - last_time).seconds < 2:
+    while (now_time - last_time).seconds <= delay_time:
         sleep(1)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
