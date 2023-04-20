@@ -4,24 +4,45 @@ import datetime
 import time
 from typing import Optional
 
+class Test:
+    user_id: int
+    math: int
+    other: int
+    structure: int
+    dp: int
+    geometry: int
+    graphic: int
+    strings: int
+
+    def __init__(self, user_id, math, other, structure, dp, geometry, graphic, strings):
+        self.user_id = user_id
+        self.math = math
+        self.other = other
+        self.structure = structure
+        self.dp = dp
+        self.geometry = geometry
+        self.graphic = graphic
+        self.strings = strings
+
 class Problem: # 数据库题目类
-    id: int
     name: str
-    website: str
+    contest_id: int
     index: str
     url: str
     tags: list[str]
 
-    def __init__(self, id: int, name: str, website: str, index: str, url: str, tags: Optional[list] = None):
-        self.id = id
+    def __init__(self, name: str, contest_id: int, index: str, url: str, tags: Optional[list] = None):
         self.name = name
-        self.website = website
+        self.contest_id = contest_id
         self.index = index
         self.url = url
         self.tags = tags
 
     def to_string(self) -> str:
-        return f"{self.website}{self.index} {self.name}: {self.url}\ntags: {','.join(self.tags)}"
+        return f"{self.website}{self.index} {self.name}: {self.url}\ntags: {','.join(self.tags)}\nrating: {self.rating}"
+
+    def write(self) -> str:
+        return f"{self.contest_id}{self.index}"
 
 class Score: # 数据库成绩类
     contest_id: int
@@ -194,7 +215,7 @@ class DataBase:
             return cursor
         except:
             self.db.rollback()
-            raise ValueError(failure_info + ": ")
+            raise ValueError(failure_info)
 
 class UserTable(DataBase):
     def __init__(self):
@@ -361,6 +382,29 @@ class ScoreTable(DataBase):
             ret.append(Score(line[0], line[1], line[2], line[3], line[4]))
 
         return ret
+
+class TestTable(DataBase):
+    def __init__(self):
+        super(TestTable, self).__init__()
+
+    def insert(self, test : Test):
+        sql = f"insert into tests(id, math, other, struc, dp, geo, grap, str) values ({test.user_id}, {test.math}, {test.other}, {test.structure}, {test.dp}, {test.geometry}, {test.graphic}, {test.strings});"
+        print(sql)
+        self.exec(sql, "In class TestTable function insert test insert error")
+
+    def update(self, test: Test):
+        sql = f"update tests set math = {test.math}, other = {test.other}, struc = {test.structure}, dp = {test.dp}, geo = {test.geometry}, grap = {test.graphic}, str = {test.strings} where id = {test.user_id};"
+        return self.exec(sql, "In class TestTable function update test update error").rowcount > 0
+
+    def find(self, id: int) -> Optional[Test]:
+        sql = "select * from tests"
+        lines = self.exec(sql, "In class TestTable function find test update error").fetchall()
+        print(lines)
+        if len(lines) == 0:
+            return None
+        line = lines[0]
+        print(line)
+        return Test(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7])
 
 __all__ = {
     "User",
