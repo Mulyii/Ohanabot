@@ -9,7 +9,7 @@ from .Data_manager import Data_manager
 __plugin_meta__ = PluginMetadata(
     name="菜单",
     description="这是一个菜单插件",
-    usage="输入help以获取功能菜单, 输入help + 对应的数字以获取对应菜单的详细功能"
+    usage="输入#help以获取功能菜单, 输入#help + 对应的数字以获取对应菜单的详细功能"
 )
 
 driver = get_driver()
