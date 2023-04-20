@@ -36,7 +36,7 @@ multi_person_movement = on_command(
 
 
 class mpm:
-    def __init__(self, problem: Problem, begin_time: datetime.datetime.now()):
+    def __init__(self, problem: Problem, begin_time = datetime.datetime.now()):
         self.problem = problem
         self.joinPerson: List[User] = []
         self.begin_time = begin_time
@@ -61,7 +61,7 @@ def check_accept(user: User):
 
 
 async def create_mpm(matcher: Matcher, dif: int = 1500):
-    await contest(cf.random_rating_problem(dif))
+    contest(cf.random_rating_problem(dif))
     await matcher.send(f'创建了一场比赛，题目难度为{dif}，链接为{contest.info()}, 输入#join可以加入这场比赛')
 
 
