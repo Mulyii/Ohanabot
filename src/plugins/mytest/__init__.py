@@ -8,9 +8,23 @@ from nonebot_plugin_apscheduler import scheduler
 from lib.config import ConfigClass
 from datetime import datetime, timedelta
 import random
+from nonebot.plugin import PluginMetadata
 
-mytest_start = on_command("myteststart")
-mytest_finish = on_command("mytestfinish")
+
+__plugin_meta__ = PluginMetadata(
+    name="自我测试(mytest)",
+    description="自我测评",
+    usage="输入#myteststart开始测评, 输入#mytestfinish结束测评，返回题目完成情况",
+    extra={
+        "unique_name": "mytest",
+        "author": "xcw <915759345@qq.com>",
+        "version": "1.0.0"
+    }
+)
+
+mytest_start = on_command("myteststart", aliases={"开始测评"})
+mytest_finish = on_command("mytestfinish", aliases={"结束测评"})
+
 config = ConfigClass()
 user_table = UserTable()
 test_table = TestTable()
@@ -53,6 +67,10 @@ async def mytest_start_receiver(qq_account: DependClass = Depends(DependClass, u
 async def mytest_finish_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     print("finish")
     save_file = "./data/" + str(qq_account.uid) + "info.txt";
+    if not os.path.exists(save_file):
+        await response(mytest_finish, "请先使用#myteststart命令")
+        return
+
     with open(save_file, "r") as f:
         lines = f.readlines()
 
