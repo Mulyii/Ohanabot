@@ -1,5 +1,7 @@
 import pymysql
 from nonebot import on_command
+from nonebot.plugin import PluginMetadata
+
 from lib.dependclass import DependClass
 from nonebot.params import Depends
 from lib.databaseclass import User
@@ -7,8 +9,20 @@ from lib.databaseclass import UserTable
 from lib.config import register_help, unregister_help
 from lib.dependclass import response
 
-register = on_command("register")
-unregister = on_command("unregister")
+__plugin_meta__ = PluginMetadata(
+    name="注册/注销",
+    description="完善个人信息以解锁更多功能",
+    usage=register_help + "\n" + unregister_help,
+    extra={
+        "unique_name": "register",
+        "example": "#register 张三 1234567890\n#unregister 张三 1234567890",
+        "author": "xcw <915759345@qq.com>",
+        "version": "1.0.0"
+    }
+)
+
+register = on_command("register", aliases={"注册"})
+unregister = on_command("unregister", aliases={"注销"})
 
 
 def split_to_pair(s: str) -> list:
