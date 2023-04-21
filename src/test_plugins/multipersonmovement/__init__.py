@@ -19,7 +19,7 @@ from lib.config import ConfigClass
 __plugin_meta__ = PluginMetadata(
     name="多人运动(multi-person movement)",
     description="创建一场比赛或者加入一场正在进行的比赛",
-    usage="输入#mpm创建一场比赛(难度可选, 默认1500), 例: #mpm 1400, 输入#join加入正在进行的比赛",
+    usage="输入#mpm创建一场比赛(难度可选, 默认1500; 时长可选, 默认0.5h), 例: #mpm 1400, 输入#join加入正在进行的比赛",
     extra={
         "unique_name": "multi_person_movement",
         "author": "xjq <466010106@qq.com>",
@@ -36,19 +36,23 @@ multi_person_movement = on_command(
 
 
 class mpm:
-    def __init__(self, problem: Problem, begin_time=datetime.datetime.now()):
+    def __init__(self, problem: Problem, begin_time=datetime.datetime.now(), length: float = 1800):
         self.problem = problem
         self.joinPerson: List[User] = []
         self.begin_time = begin_time
+        self.length = length
 
     def addPerson(self, user: User):
         self.joinPerson.append(user)
 
     def get_url(self):
         return self.problem.url
-    
+
     def get_tags(self):
         return self.problem.tags
+
+    def get_length(self):
+        return self.length
 
 
 contest: mpm = None
@@ -56,6 +60,7 @@ timer: TimerHandle = None
 
 config = ConfigClass()
 user_table = UserTable()
+
 
 def mpm_running():
     return contest != None
@@ -65,15 +70,15 @@ def check_accept(user: User):
     global contest
     if contest == None:
         return False
-    return cf.check_submission(user.codeforces_id, contest.problem.write(), contest.begin_time, datetime.datetime.now())
+    # return cf.check_submission(user.codeforces_id, [int(contest.problem.contest_id), contest.problem.index], contest.begin_time, datetime.datetime.now())
+    return cf.is_user_finished(user_name=user.codeforces_id, prob=contest.problem)
 
 
 async def create_mpm(matcher: Matcher, dif: int = 1500):
     global contest
-    # contest = mpm(cf.random_rating_problem(dif))
-    contest = mpm(Problem("Timber", 1821, 'F',
-                  'https://codeforces.com/problemset/problem/1821/F'))
-    await matcher.finish(f'创建了一场比赛，题目难度为{dif}，链接为:{contest.get_url()}, 输入#join可以加入这场比赛')
+    contest = mpm(cf.random_rating_problem(dif))
+    # contest = mpm(Problem("Timber", 1821, 'F', 'https://codeforces.com/problemset/problem/1821/F'))
+    await matcher.finish(f'创建了一场比赛，限时{contest.length() / 3600}h, 题目难度为{dif}，链接为:{contest.get_url()}, 输入#join可以加入这场比赛')
 
 
 async def stop_mpm(matcher: Matcher):
@@ -82,7 +87,7 @@ async def stop_mpm(matcher: Matcher):
     table: List[List[str]] = []
     headers = ['参赛选手', '通过状态']
     for user in contest.joinPerson:
-        state = "accepted" if check_accept(user) else "rejected"
+        state = "Accepted" if check_accept(user) else "Rejected"
         table.append([user.qq, state])
     contest = None
     timer = None
@@ -105,7 +110,7 @@ async def _(matcher: Matcher, arg: Message = CommandArg()):
         await matcher.finish(f"现在正在进行的比赛是：{contest.get_url()}, 你可以输入#join加入这场比赛")
     dif = arg.extract_plain_text().strip()
     if not dif:
-        set_timeout(matcher, 20)
+        set_timeout(matcher)
         await create_mpm(matcher)
     elif not dif.isdigit():
         await matcher.finish(f'请输入一个合法的难度')
@@ -115,7 +120,7 @@ async def _(matcher: Matcher, arg: Message = CommandArg()):
             dif = 800
         elif dif > 3500:
             dif = 3500
-        set_timeout(matcher, 20)
+        set_timeout(matcher)
         await create_mpm(matcher, dif)
 
 join = on_command(
@@ -124,7 +129,6 @@ join = on_command(
     priority=5,
     block=True
 )
-
 
 
 @join.handle()
@@ -137,6 +141,6 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
         await join.finish(f'请先注册')
     elif user.codeforces_id == '':
         await join.finish(f'请设置你的Codeforces账号名')
-    else :
+    else:
         contest.addPerson(user)
-        await join.finish(f'加入比赛成功')
+        await join.finish(Message(f'[CQ:at,qq={qq_account.uid}] 加入比赛成功'))
