@@ -1,5 +1,5 @@
 from nonebot import on_command
-from lib.dependclass import DependClass, response, send
+from lib.dependclass import DependClass, response
 from nonebot.params import Depends, Event, Received
 from lib.databaseclass import UserTable, TestTable, User, Test
 import os

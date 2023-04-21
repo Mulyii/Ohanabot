@@ -50,7 +50,7 @@ class Data_manager(object):
                 f'{id} .  <strong>{name}</strong>\n'\
                 f'</ul>\n'
             id += 1
-        return await md_to_pic(menu_names, width=300)
+        return await md_to_pic(menu_names, width=1000)
 
     async def get_details(self, plugin_id):
         plugin_item = self.plugins_menu_list[plugin_id - 1]
