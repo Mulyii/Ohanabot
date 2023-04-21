@@ -41,7 +41,7 @@ class mpm:
         self.begin_time = begin_time
         self.length = length
 
-    def addPerson(self, user: User, nickname:str):
+    def addPerson(self, user: User, nickname: str):
         self.joinPerson.append((user, nickname))
 
     def get_url(self):
