@@ -4,12 +4,11 @@ from nonebot import on_command
 from nonebot import logger
 from nonebot.params import ArgPlainText
 from nonebot.params import Depends
-from nonebot.exception import RejectedException
 from lib.dependclass import DependClass
 from .Chatbot import ChatBot
-from nonebot.typing import T_State
 import openai
-
+from nonebot.adapters.onebot.v11.message import Message, MessageSegment
+from nonebot_plugin_htmlrender import md_to_pic
 
 __plugin_meta__ = PluginMetadata(
     name="GPT聊天",
@@ -47,7 +46,7 @@ async def _():
     await switch_off.finish("聊天服务已经关闭")
 
 
-chat = on_command("chat", priority=50, block=False, rule=chat_switch_rule)
+chat = on_command("chat", priority=50, block=False)
 
 
 
@@ -67,6 +66,8 @@ def stop_bot(qq_account: DependClass):
 
 @chat.got("query", prompt="现在有最多十次的对话机会，你可以在任何时候输入exit提前结束对话")
 async def _(query: str = ArgPlainText(), qq_account: DependClass = Depends(DependClass, use_cache=False)):
+    if qq_account.type == "private":
+        chat.finish(f"!!!仅限公聊!!!")
     uid = qq_account.uid
     if not bot_running(qq_account):
         try:
@@ -76,15 +77,12 @@ async def _(query: str = ArgPlainText(), qq_account: DependClass = Depends(Depen
             logger.opt(colors=True).error(f"<r>gpt启动失败\n{e}</r>")
             chat.finish(f"出现了不可解决的问题，gpt启动失败")
 
-    if counters[uid] >= 10 or query == 'exit':
+    counters[uid] += 1
+
+    if counters[uid] == 10 or query == 'exit':
+        if query != 'exit' :
+            await chat.send(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(chatbots[uid].ask(query))))
         stop_bot(qq_account)
         await chat.finish(f"对话结束，感谢使用")
-    else:
-        counters[uid] += 1
     logger.info(counters[uid])
-    try:
-        await chat.reject(f"{chatbots[uid].ask(query)}")
-    except Exception as e:
-        if not isinstance(e, RejectedException):
-            logger.opt(colors=True).error(f"<r>发生异常, {e} </r>")
-            await chat.finish(f"发生异常")
+    await chat.reject(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(chatbots[uid].ask(query))))

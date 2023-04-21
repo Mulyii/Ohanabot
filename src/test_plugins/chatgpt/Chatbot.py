@@ -6,7 +6,7 @@ class ChatBot:
             {"role": "user", "content": "Hello!"}
         ]
 
-    def ask(self, query: str) :
+    def ask(self, query: str) -> str:
         self.message.append({"role": "user", "content": query})
         rsp = openai.ChatCompletion.create(
             max_tokens = 200,
