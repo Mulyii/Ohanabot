@@ -9,7 +9,7 @@ import os
 __plugin_meta__ = PluginMetadata(
     name="今日人品",
     description="快来看看你今日的运势如何吧",
-    usage="回复#jrrp获得当日的幸运数字",
+    usage="输入#jrrp获得当日的幸运数字",
 )
 
 #  创建储存文件

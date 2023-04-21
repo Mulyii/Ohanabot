@@ -5,7 +5,7 @@ from typing import List
 
 from nonebot.matcher import Matcher
 from nonebot import on_command
-from nonebot.params import CommandArg, Depends
+from nonebot.params import Depends
 from nonebot.adapters.onebot.v11.message import Message, MessageSegment
 from nonebot.plugin import PluginMetadata
 
@@ -15,13 +15,12 @@ from lib.to_picture import table_to_pic
 from lib.dependclass import DependClass
 from lib.config import ConfigClass
 
-
 __plugin_meta__ = PluginMetadata(
     name="多人运动(multi-person movement)",
     description="创建一场比赛或者加入一场正在进行的比赛",
-    usage="输入#mpm创建一场比赛(难度可选, 默认1500; 时长可选, 默认0.5h), 例: #mpm 1400, 输入#join加入正在进行的比赛",
+    usage="输入#mpm创建一场比赛(难度可选, 默认1500), 例: #mpm 1400, 输入#join加入正在进行的比赛",
     extra={
-        "unique_name": "multi_person_movement",
+        "unique_name": "multi-person_movement",
         "author": "xjq <466010106@qq.com>",
         "version": "1.0.0"
     }
@@ -36,14 +35,14 @@ multi_person_movement = on_command(
 
 
 class mpm:
-    def __init__(self, problem: Problem, begin_time=datetime.datetime.now(), length: float = 1800):
+    def __init__(self, problem: Problem, begin_time=datetime.datetime.now(), length: float = 3600):
         self.problem = problem
-        self.joinPerson: List[User] = []
+        self.joinPerson: List[tuple(User, str)] = []
         self.begin_time = begin_time
         self.length = length
 
-    def addPerson(self, user: User):
-        self.joinPerson.append(user)
+    def addPerson(self, user: User, nickname:str):
+        self.joinPerson.append((user, nickname))
 
     def get_url(self):
         return self.problem.url
@@ -78,7 +77,7 @@ async def create_mpm(matcher: Matcher, dif: int = 1500):
     global contest
     contest = mpm(cf.random_rating_problem(dif))
     # contest = mpm(Problem("Timber", 1821, 'F', 'https://codeforces.com/problemset/problem/1821/F'))
-    await matcher.finish(f'创建了一场比赛，限时{contest.length() / 3600}h, 题目难度为{dif}，链接为:{contest.get_url()}, 输入#join可以加入这场比赛')
+    await matcher.finish(f'创建了一场比赛，比赛时间1h, 题目难度为{dif}，链接为:{contest.get_url()}, 输入#join可以加入这场比赛')
 
 
 async def stop_mpm(matcher: Matcher):
@@ -86,9 +85,11 @@ async def stop_mpm(matcher: Matcher):
     global timer
     table: List[List[str]] = []
     headers = ['参赛选手', '通过状态']
-    for user in contest.joinPerson:
+    for user_name in contest.joinPerson:
+        user = user_name[0]
+        name = user_name[1]
         state = "Accepted" if check_accept(user) else "Rejected"
-        table.append([user.qq, state])
+        table.append([name, state])
     contest = None
     timer = None
     await matcher.finish(Message(f'比赛结束，结果如下') + MessageSegment.image(await table_to_pic(f"比赛结果", headers, table)))
@@ -104,11 +105,11 @@ def set_timeout(matcher: Matcher, timeout: float = 3600):
 
 
 @multi_person_movement.handle()
-async def _(matcher: Matcher, arg: Message = CommandArg()):
+async def _(matcher: Matcher, qq_account: DependClass = Depends(DependClass, use_cache=False)):
     global contest
     if contest != None:
         await matcher.finish(f"现在正在进行的比赛是：{contest.get_url()}, 你可以输入#join加入这场比赛")
-    dif = arg.extract_plain_text().strip()
+    dif = qq_account.message.strip()
     if not dif:
         set_timeout(matcher)
         await create_mpm(matcher)
@@ -140,7 +141,7 @@ async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     if user == None:
         await join.finish(f'请先注册')
     elif user.codeforces_id == '':
-        await join.finish(f'请设置你的Codeforces账号名')
+        await join.finish(f'请先绑定你的Codeforces账号')
     else:
-        contest.addPerson(user)
+        contest.addPerson(user, qq_account.nickname)
         await join.finish(Message(f'[CQ:at,qq={qq_account.uid}] 加入比赛成功'))

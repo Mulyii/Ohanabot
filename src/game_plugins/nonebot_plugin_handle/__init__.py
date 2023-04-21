@@ -40,7 +40,7 @@ __plugin_meta__ = PluginMetadata(
     name="猜成语",
     description="汉字Wordle 猜成语",
     usage=(
-        "@我 + “猜成语”开始游戏；\n"
+        "输入#handle开始游戏；\n"
         "你有十次的机会猜一个四字词语；\n"
         "每次猜测后，汉字与拼音的颜色将会标识其与正确答案的区别；\n"
         "青色 表示其出现在答案中且在正确的位置；\n"
@@ -48,7 +48,7 @@ __plugin_meta__ = PluginMetadata(
         "每个格子的 汉字、声母、韵母、声调 都会独立进行颜色的指示。\n"
         "当四个格子都为青色时，你便赢得了游戏！\n"
         "可发送“结束”结束游戏；可发送“提示”查看提示。\n"
-        "使用 --strict 选项开启成语检查，即猜测的短语必须是成语，如：@我 猜成语 --strict"
+        "使用 --strict 选项开启成语检查，即猜测的短语必须是成语，如：#handle --strict"
     ),
     extra={
         "unique_name": "handle",

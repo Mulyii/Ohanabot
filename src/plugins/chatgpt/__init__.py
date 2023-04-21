@@ -14,7 +14,7 @@ import openai
 __plugin_meta__ = PluginMetadata(
     name="GPT聊天",
     description="和chatGPT对话",
-    usage="发送chat命令开启一段对话"
+    usage="发送#chat命令开启一段对话"
 )
 
 openai.organization = "org-m1n1DhFATSP7eMph8SSP9mRF"

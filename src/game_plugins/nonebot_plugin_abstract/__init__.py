@@ -4,8 +4,13 @@ from nonebot.typing import T_State
 from nonebot.adapters.onebot.v11 import Bot, Event, Message
 from nonebot.params import CommandArg, ArgStr
 from .data import text_to_emoji
+from nonebot.plugin import PluginMetadata
 
-
+__plugin_meta__ = PluginMetadata(
+    name="抽象",
+    description="抽象一段文字",
+    usage="输入#abstract + 所要抽象的对象， 例：#abstract 你好",
+)
 abstract = on_command("abstract", aliases={"抽象", "抽象化"}, priority=5, block=True)
 
 @abstract.handle()

@@ -11,7 +11,7 @@ from nonebot.typing import T_State
 __plugin_meta__ = PluginMetadata(
     name="对对联",
     description="人工智能和你对对联",
-    usage="对联<内容>(数量)",
+    usage="输入#对联 + 内容 + 数量(可选)",
     extra={
         "author":  "惜月 <277073121@qq.com>",
         "version": "1.0.0",
