@@ -22,6 +22,8 @@ openai.organization = "org-m1n1DhFATSP7eMph8SSP9mRF"
 openai.api_key = "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"
 
 chat_switch = True
+
+
 async def chat_switch_rule():
     return chat_switch
 
@@ -45,33 +47,44 @@ async def _():
     await switch_off.finish("聊天服务已经关闭")
 
 
-chat = on_command("chat", priority=50, block=True, rule=chat_switch_rule)
+chat = on_command("chat", priority=50, block=False, rule=chat_switch_rule)
 
 
-chatbot: ChatBot = None
+
+chatbots: dict[str, ChatBot] = {}
+counters: dict[str, int] = {}
+
+
+def bot_running(qq_account: DependClass):
+    return bool(chatbots.get(qq_account.uid, None))
+
+
+def stop_bot(qq_account: DependClass):
+    if bot_running(qq_account):
+        chatbots.pop(qq_account.uid)
+        counters.pop(qq_account.uid)
 
 
 @chat.got("query", prompt="现在有最多十次的对话机会，你可以在任何时候输入exit提前结束对话")
-async def _(state: T_State, query: str = ArgPlainText(), qq_account: DependClass = Depends(DependClass, use_cache=False)):
-    global chatbot
-    try_count = state.get("try_count", 1)
-    if try_count == 1:
+async def _(query: str = ArgPlainText(), qq_account: DependClass = Depends(DependClass, use_cache=False)):
+    uid = qq_account.uid
+    if not bot_running(qq_account):
         try:
-            chatbot = ChatBot(qq_account.uid)
+            chatbots[uid] = ChatBot(uid)
+            counters[uid] = 0
         except RuntimeError as e:
             logger.opt(colors=True).error(f"<r>gpt启动失败\n{e}</r>")
             chat.finish(f"出现了不可解决的问题，gpt启动失败")
 
-    if try_count >= 10:
-        await chat.finish(f"已达次数上限，对话结束，感谢使用")
-    state["try_count"] = try_count + 1
-
-    if query == "exit":
-        await chat.finish(f"对话已结束，感谢使用")
+    if counters[uid] >= 10 or query == 'exit':
+        stop_bot(qq_account)
+        await chat.finish(f"对话结束，感谢使用")
     else:
-        try:
-            await chat.reject(f"{chatbot.ask(query)}")
-        except Exception as e:
-            if not isinstance(e, RejectedException):
-                logger.opt(colors=True).error(f"<r>发生异常, {e} </r>")
-                await chat.reject(f"发生异常")
+        counters[uid] += 1
+    logger.info(counters[uid])
+    try:
+        await chat.reject(f"{chatbots[uid].ask(query)}")
+    except Exception as e:
+        if not isinstance(e, RejectedException):
+            logger.opt(colors=True).error(f"<r>发生异常, {e} </r>")
+            await chat.finish(f"发生异常")
