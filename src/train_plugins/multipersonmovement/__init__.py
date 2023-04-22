@@ -13,7 +13,6 @@ import lib.codeforcesAPI as cf
 from lib.databaseclass import Problem, User, UserTable
 from lib.to_picture import table_to_pic
 from lib.dependclass import DependClass
-from lib.config import ConfigClass
 
 __plugin_meta__ = PluginMetadata(
     name="多人运动(multi-person movement)",

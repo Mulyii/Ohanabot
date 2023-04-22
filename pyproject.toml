@@ -11,5 +11,5 @@ adapters = [
 ]
 plugins = ["nonebot_plugin_apscheduler", "nonebot_plugin_htmlrender"]
 
-plugin_dirs = ["src/test_plugins", "src/plugins", "src/game_plugins", "src/basic_plugins","src/tarin_plugins"]
+plugin_dirs = ["src/test_plugins", "src/plugins", "src/game_plugins", "src/basic_plugins","src/train_plugins"]
 builtin_plugins = ["echo"]
