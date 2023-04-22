@@ -4,6 +4,7 @@ from lib.dependclass import DependClass, response
 from nonebot.params import Depends
 from lib.config import welcome_word
 from lib.databaseclass import InteractionTable, InteractionMessage
+from nonebot.plugin import PluginMetadata
 import datetime
 
 __plugin_meta__ = PluginMetadata(
