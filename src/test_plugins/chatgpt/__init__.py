@@ -73,7 +73,7 @@ async def _(query: str = ArgPlainText(), qq_account: DependClass = Depends(Depen
         try:
             chatbots[uid] = ChatBot(uid)
             counters[uid] = 0
-        except RuntimeError as e:
+        except Exception as e:
             logger.opt(colors=True).error(f"<r>gpt启动失败\n{e}</r>")
             chat.finish(f"出现了不可解决的问题，gpt启动失败")
 

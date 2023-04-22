@@ -57,7 +57,6 @@ class mpm:
 contest: mpm = None
 timer: TimerHandle = None
 
-config = ConfigClass()
 user_table = UserTable()
 
 

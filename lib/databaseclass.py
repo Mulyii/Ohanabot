@@ -1,7 +1,7 @@
 import pymysql
 from lib.config import ConfigClass
 import datetime
-import time
+import time as tim
 from typing import Optional
 
 class Test:
@@ -38,8 +38,8 @@ class Problem: # 数据库题目类
         self.url = url
         self.tags = tags
 
-    def to_string(self) -> str:
-        return f"{self.website}{self.index} {self.name}: {self.url}\ntags: {','.join(self.tags)}\nrating: {self.rating}"
+    # def to_string(self) -> str:
+    #     return f"{self.website}{self.index} {self.name}: {self.url}\ntags: {','.join(self.tags)}\nrating: {self.rating}"
 
     def write(self) -> str:
         return f"{self.contest_id}{self.index}"
@@ -62,10 +62,10 @@ class Contest: # 数据库比赛类
     id: int
     name: str
     time: datetime
-    duration: time
+    duration: tim
     site: str
 
-    def __init__(self, id: int, name: str, time: datetime, duration: time, site: str):
+    def __init__(self, id: int, name: str, time: datetime, duration: tim, site: str):
         self.id = id
         self.name = name
         self.time = time
@@ -311,7 +311,7 @@ class MissionTable(DataBase):
 
 class ProblemTable(DataBase):
     def __init__(self):
-        super(Promblem, self).__init__()
+        super(Problem, self).__init__()
 
     def insert(self, problem: Problem):
         sql = f"insert into problems (problemid, problemname, website, problemindex, url) values ({problem.id}, '{problem.name}', '{problem.website}', '{problem.index}', '{problem.url}');"
