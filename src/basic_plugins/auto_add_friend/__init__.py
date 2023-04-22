@@ -6,6 +6,17 @@ from lib.config import welcome_word
 from lib.databaseclass import InteractionTable, InteractionMessage
 import datetime
 
+__plugin_meta__ = PluginMetadata(
+    name="添加机器人为好友",
+    description="添加机器人为好友",
+    usage="以ACMClub开头，后面加备注信息（班级姓名学号）\n例：ACMLClub 计科1001 张三 1000000000",
+    extra={
+        "unique_name": "addhelp",
+        "author": "xcw <915759345@qq.com>",
+        "version": "1.0.0"
+    }
+)
+
 add_friend = on_request(priority=1, block=True)
 admin_qq = 915759345
 
