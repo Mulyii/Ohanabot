@@ -19,11 +19,19 @@ unregister_help = """命令格式:
 
 task_help = """123"""
 
-class ConfigClass: # 数据库配置类
+test_number = 10
+
+
+class ConfigClass:  # 数据库配置类
     def __init__(self):
         self.database = {
-            "host": "47.115.207.251",
+            "host": "localhost",
             "user": "root",
-            "password": "ACMclub2021",
+            "password": "root",
             "port": 3306
+        }
+        self.test = {
+            "maxrating": 1900,
+            "minrating": 800,
+            "number": 10
         }
