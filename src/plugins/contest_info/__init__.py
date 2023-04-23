@@ -48,6 +48,6 @@ async def contest(user: DependClass = Depends(DependClass, use_cache=False)):
         final_contest += '\n'
     # final_contest += '\n'
 
-    await contest_info.finish("最近一个月的比赛：\n{}".format(final_contest))
+    await contest_info.finish("最近的比赛：\n{}".format(final_contest))
     # except:
     #     print("failed!")
