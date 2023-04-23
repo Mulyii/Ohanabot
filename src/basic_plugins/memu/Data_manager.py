@@ -38,7 +38,7 @@ class Data_manager(object):
                         f"<r>{plugin.name} 菜单数据加载失败\n</r>"
                         f"<r>{e}</r>"
                     )
-        self.plugins_menu_list.sort(key=lambda x: x.name.encode("gbk"))
+        self.plugins_menu_list.sort(key=lambda x: len(x.name))
         self.plugins_menu_list_name = [
             id.name for id in self.plugins_menu_list]
 
@@ -46,11 +46,11 @@ class Data_manager(object):
         menu_names = '<div align="center"><h1> 菜单 </h1></div>\n'
         id = 1
         for name in self.plugins_menu_list_name:
-            menu_names += f'<div align="center">\n'\
+            menu_names += f'<div>\n'\
                 f'{id} .  <strong>{name}</strong>\n'\
-                f'</ul>\n'
+                f'</div>\n'
             id += 1
-        return await md_to_pic(menu_names, width=1000)
+        return await md_to_pic(menu_names, width=800)
 
     async def get_details(self, plugin_id):
         plugin_item = self.plugins_menu_list[plugin_id - 1]
