@@ -13,7 +13,7 @@ from lib.to_picture import table_to_pic
 
 
 __plugin_meta__ = PluginMetadata(
-    name="自我测试(mytest)",
+    name="自我测试",
     description="自我测评",
     usage="输入#myteststart开始测评, 输入#mytestfinish结束测评，返回题目完成情况， 输入#mytestresult查看评测结果",
     extra={

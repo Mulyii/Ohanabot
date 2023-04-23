@@ -11,7 +11,7 @@ from lib.dependclass import response
 
 __plugin_meta__ = PluginMetadata(
     name="注册/注销",
-    description="完善个人信息以解锁更多功能",
+    description="完善个人信息以解锁更多功能, 注册前先添加机器人为好友，可以再help里查看",
     usage=register_help + "\n" + unregister_help,
     extra={
         "unique_name": "register",

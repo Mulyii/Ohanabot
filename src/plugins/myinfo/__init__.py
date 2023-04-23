@@ -8,7 +8,7 @@ from lib.databaseclass import User
 from lib.databaseclass import UserTable
 
 __plugin_meta__ = PluginMetadata(
-    name="个人信息修改查看(myinfo, sethelp, setname, setstuid, setcodeforces)",
+    name="个人信息修改查看",
     description="查看和修改个人信息",
     usage="输入#myinfo查看个人信息\n输入#sethelp查看如何修改个人信息",
     extra={

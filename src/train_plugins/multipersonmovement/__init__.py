@@ -15,7 +15,7 @@ from lib.to_picture import table_to_pic
 from lib.dependclass import DependClass
 
 __plugin_meta__ = PluginMetadata(
-    name="多人运动(multi-person movement)",
+    name="多人运动",
     description="创建一场比赛或者加入一场正在进行的比赛",
     usage="输入#mpm创建一场比赛(难度可选, 默认1500), 例: #mpm 1400, 输入#join加入正在进行的比赛",
     extra={
