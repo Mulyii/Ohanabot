@@ -5,6 +5,7 @@ from nonebot.plugin import PluginMetadata
 from nonebot import on_command, get_driver
 from nonebot.params import CommandArg
 from .Data_manager import Data_manager
+from nonebot import logger
 
 __plugin_meta__ = PluginMetadata(
     name="菜单",
@@ -31,11 +32,13 @@ menu_switch = True
 
 async def menu_switch_rule():
     return menu_switch
+
+
 menu = on_command("菜单", aliases={
                   "menu", "帮助", "功能", "help"}, priority=5, block=True, rule=menu_switch_rule)
 switch_on = on_command(("help","on"), priority=5, permission=SUPERUSER, block=True)
 switch_off = on_command(("help","off"), priority=5, permission=SUPERUSER, block=True)
-
+set_width = on_command(("help","set_width"), priority=1, block=True, permission=SUPERUSER)
 
 @switch_on.handle()
 async def _(matcher: Matcher):
@@ -49,6 +52,16 @@ async def _(matcher: Matcher):
     global menu_switch
     menu_switch = False
     await matcher.finish("菜单已经关闭")
+
+@set_width.handle()
+async def _(matcher : Matcher, args: Message = CommandArg()):
+    width = args.extract_plain_text().strip()
+    logger.info(width)
+    if width != None and width.isdigit():
+        data_manager.set_with(int(width))
+        await matcher.finish(f"成功设置宽度为{width}")
+    else:
+        await matcher.finish(f"请输入合法的宽度")
 
 
 @menu.handle()

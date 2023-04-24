@@ -12,6 +12,7 @@ class Data_manager(object):
     def __init__(self):
         self.plugins_menu_list: List[Plugin_Menu_item] = []
         self.plugins_menu_list_name: List[str] = []
+        self.width = 500
 
     def load_plugin_info(self):
         def load_from_dict(_meta_data: PluginMetadata):
@@ -38,9 +39,12 @@ class Data_manager(object):
                         f"<r>{plugin.name} 菜单数据加载失败\n</r>"
                         f"<r>{e}</r>"
                     )
-        self.plugins_menu_list.sort(key=lambda x: len(x.name))
+        self.plugins_menu_list.sort(key=lambda x: x.name.encode("utf-8"))
         self.plugins_menu_list_name = [
             id.name for id in self.plugins_menu_list]
+
+    def set_with(self, width:int):
+        self.width = width
 
     async def get_menu_names(self):
         menu_names = '<div align="center"><h1> 菜单 </h1></div>\n'
@@ -50,7 +54,7 @@ class Data_manager(object):
                 f'{id} .  <strong>{name}</strong>\n'\
                 f'</div>\n'
             id += 1
-        return await md_to_pic(menu_names, width=800)
+        return await md_to_pic(menu_names, width=self.width)
 
     async def get_details(self, plugin_id):
         plugin_item = self.plugins_menu_list[plugin_id - 1]

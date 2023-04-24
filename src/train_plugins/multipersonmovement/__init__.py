@@ -8,6 +8,7 @@ from nonebot import on_command
 from nonebot.params import Depends
 from nonebot.adapters.onebot.v11.message import Message, MessageSegment
 from nonebot.plugin import PluginMetadata
+from nonebot.permission import SUPERUSER
 
 import lib.codeforcesAPI as cf
 from lib.databaseclass import Problem, User, UserTable
@@ -32,6 +33,12 @@ multi_person_movement = on_command(
     block=True
 )
 
+force_stop = on_command (
+    ("mpm","stop"),
+    priority=1,
+    permission=SUPERUSER,
+    block=True
+)
 
 class mpm:
     def __init__(self, problem: Problem, begin_time=datetime.datetime.now(), length: float = 3600):
@@ -63,7 +70,7 @@ def mpm_running():
     return contest != None
 
 
-def check_accept(user: User):
+async def check_accept(user: User):
     global contest
     if contest == None:
         return False
@@ -92,6 +99,9 @@ async def stop_mpm(matcher: Matcher):
     timer = None
     await matcher.finish(Message(f'比赛结束，结果如下') + MessageSegment.image(await table_to_pic(f"比赛结果", headers, table)))
 
+@force_stop.handle()
+async def _(matcher:Matcher):
+    await stop_mpm(matcher)
 
 def set_timeout(matcher: Matcher, timeout: float = 3600):
     global timer

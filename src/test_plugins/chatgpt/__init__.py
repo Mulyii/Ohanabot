@@ -67,7 +67,7 @@ def stop_bot(qq_account: DependClass):
 @chat.got("query", prompt="现在有最多十次的对话机会，你可以在任何时候输入exit提前结束对话")
 async def _(query: str = ArgPlainText(), qq_account: DependClass = Depends(DependClass, use_cache=False)):
     if qq_account.type == "private":
-        chat.finish(f"!!!仅限公聊!!!")
+        await chat.finish(f"!!!仅限公聊!!!")
     uid = qq_account.uid
     if not bot_running(qq_account):
         try:
@@ -75,14 +75,14 @@ async def _(query: str = ArgPlainText(), qq_account: DependClass = Depends(Depen
             counters[uid] = 0
         except Exception as e:
             logger.opt(colors=True).error(f"<r>gpt启动失败\n{e}</r>")
-            chat.finish(f"出现了不可解决的问题，gpt启动失败")
+            await chat.finish(f"出现了不可解决的问题，gpt启动失败")
 
     counters[uid] += 1
 
     if counters[uid] == 10 or query == 'exit':
         if query != 'exit' :
-            await chat.send(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(chatbots[uid].ask(query))))
+            await chat.send(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(await chatbots[uid].ask(query))))
         stop_bot(qq_account)
         await chat.finish(f"对话结束，感谢使用")
     logger.info(counters[uid])
-    await chat.reject(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(chatbots[uid].ask(query))))
+    await chat.reject(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(await chatbots[uid].ask(query))))
