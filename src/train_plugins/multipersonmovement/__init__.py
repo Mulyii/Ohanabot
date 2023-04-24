@@ -33,12 +33,13 @@ multi_person_movement = on_command(
     block=True
 )
 
-force_stop = on_command (
-    ("mpm","stop"),
+force_stop = on_command(
+    ("mpm", "stop"),
     priority=1,
     permission=SUPERUSER,
     block=True
 )
+
 
 class mpm:
     def __init__(self, problem: Problem, begin_time=datetime.datetime.now(), length: float = 3600):
@@ -81,7 +82,6 @@ async def check_accept(user: User):
 async def create_mpm(matcher: Matcher, dif: int = 1500):
     global contest
     contest = mpm(cf.random_rating_problem(dif))
-    # contest = mpm(Problem("Timber", 1821, 'F', 'https://codeforces.com/problemset/problem/1821/F'))
     await matcher.finish(f'创建了一场比赛，比赛时间1h, 题目难度为{dif}，链接为:{contest.get_url()}, 输入#join可以加入这场比赛')
 
 
@@ -99,9 +99,11 @@ async def stop_mpm(matcher: Matcher):
     timer = None
     await matcher.finish(Message(f'比赛结束，结果如下') + MessageSegment.image(await table_to_pic(f"比赛结果", headers, table)))
 
+
 @force_stop.handle()
-async def _(matcher:Matcher):
+async def _(matcher: Matcher):
     await stop_mpm(matcher)
+
 
 def set_timeout(matcher: Matcher, timeout: float = 3600):
     global timer

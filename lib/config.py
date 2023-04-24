@@ -35,3 +35,4 @@ class ConfigClass:  # 数据库配置类
             "minrating": 800,
             "number": 10
         }
+        self.openai_key = "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"

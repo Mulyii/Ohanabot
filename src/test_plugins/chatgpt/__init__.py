@@ -9,6 +9,7 @@ from .Chatbot import ChatBot
 import openai
 from nonebot.adapters.onebot.v11.message import Message, MessageSegment
 from nonebot_plugin_htmlrender import md_to_pic
+from lib.config import ConfigClass
 
 __plugin_meta__ = PluginMetadata(
     name="GPT聊天",
@@ -17,8 +18,8 @@ __plugin_meta__ = PluginMetadata(
 )
 
 openai.organization = "org-m1n1DhFATSP7eMph8SSP9mRF"
-
-openai.api_key = "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"
+configClass = ConfigClass() 
+openai.api_key = configClass.openai_key
 
 chat_switch = True
 
