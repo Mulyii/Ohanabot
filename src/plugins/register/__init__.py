@@ -36,7 +36,7 @@ async def register_receiver(qq_account: DependClass = Depends(DependClass, use_c
     print("register received")
     print(qq_account.uid, qq_account.nickname, qq_account.message)
     if qq_account.type == "group":
-        await response(register, "!!!仅私聊可用!!!", qq_account)
+        await response(register, "仅私聊可用，请先添加机器人为好友，命令请通过#help查看", qq_account)
         return
     if len(qq_account.message) == 0 or qq_account.message == "help":
         await response(register, register_help, qq_account)
@@ -72,7 +72,7 @@ qq号: {user.qq}
 @unregister.handle()
 async def unregister_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     if qq_account.type == "group":
-        await response(unregister, "!!!仅限私聊!!!", qq_account)
+        await response(unregister, "仅限私聊，请先添加机器人好友，命令请通过#help查看", qq_account)
         return
     elif len(qq_account.message) == 0 or qq_account.message == "help":
         await response(unregister, unregister_help, qq_account)
