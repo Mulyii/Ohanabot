@@ -15,4 +15,4 @@ problem_everyday = on_command(
 @problem_everyday.handle()
 async def problem(user: DependClass = Depends(DependClass, use_cache=False)):
     code_url = output_random_problem_url()
-    await problem_everyday.finish("今日随机选择的 Codeforces 题目是：{}".format(code_url))
+    await problem_everyday.finish("今日随机选择的 Codeforces 题目是：{}\今天也要努力做题喵!".format(code_url))
