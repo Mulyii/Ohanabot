@@ -53,7 +53,7 @@ async def response(receiver, mes: Union[str, bytes], depend: DependClass):  # re
     insert_message = ls[0]
     for i in range(1, len(ls)):
         insert_message += '\\' + '"' + ls[i]
-    print(insert_message)
+    #print(insert_message)
     interaction = InteractionMessage(datetime.datetime.now(), 'bot', depend.uid,  depend.type, depend.come_from, insert_message, depend.title)
     interaction_table = InteractionTable()
     interaction_table.insert(interaction)

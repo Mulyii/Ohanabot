@@ -32,18 +32,19 @@ def get_user_status(user_name: str): # 获取用户提交列表
     response = requests.get(url)
 
     data = json.loads(response.text)
-    print(data)
+    #print(data)
     submissions = data["result"]
     ls = []
     for submission in submissions:
         if submission["verdict"] == "OK":
             ls.append(submission["problem"])
+
     return ls
 
 def is_user_finished(user_name: str, prob: Problem) -> bool: # 查找用户该题是否通过
     problems = get_user_status(user_name)
     for problem in problems:
-        if str(problem["contestId"]) + problem["index"] == prob.index:
+        if problem["contestId"] == prob.contest_id and problem["index"] == prob.index:
             return True
     return False
 

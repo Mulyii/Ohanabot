@@ -35,13 +35,16 @@ async def handle_friend_request(bot: Bot, request_event: RequestEvent):
         interaction = InteractionMessage(datetime.datetime.now(), reqid, 'bot', 'add friend', reqid, message, 'add friend')
         interaction_table = InteractionTable()
         interaction_table.insert(interaction)
+        try:
+            i = message.index(' ')
+        except:
+            await request_event.reject(bot)
+            return
 
-        i = message.index(' ')
         if message[:i] == "ACMClub":
             await request_event.approve(bot, message[i + 1:])
             msg = f"已自动同意好友申请\nuid: {reqid}\ninfo:{message[i + 1:]}"
             await bot.send_private_msg(user_id=admin_qq, message=msg)
-            await bot.send_private_msg(user_id=reqid, message=welcome_word)
         else:
             await request_event.reject(bot)
 

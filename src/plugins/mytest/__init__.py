@@ -1,7 +1,7 @@
 from nonebot import on_command
 from lib.dependclass import DependClass, response
 from nonebot.params import Depends, Event, Received
-from lib.databaseclass import UserTable, TestTable, User, Test
+from lib.databaseclass import UserTable, TestTable, User, Test, Problem
 import os
 from lib.codeforcesAPI import random_rating_problem, is_user_finished, ask_for_problem_tag
 from nonebot_plugin_apscheduler import scheduler
@@ -89,7 +89,8 @@ async def mytest_finish_receiver(qq_account: DependClass = Depends(DependClass, 
     user = user_table.find_qq(qq_account.uid)
     timestr = args[2] + " " + args[3]
     tm = datetime.strptime(timestr, "%Y-%m-%d %H:%M:%S")
-    if not is_user_finished(user.codeforces_id, args[0]):
+    problem = Problem("", int(args[0][:-1]), args[0][-1], "")
+    if not is_user_finished(user.codeforces_id, problem):
         state = 1
     elif datetime.now() > tm:
         state = 2
