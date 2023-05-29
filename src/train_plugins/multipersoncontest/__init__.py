@@ -71,10 +71,11 @@ def mpc_running():
     return contest != None
 
 
-async def check_accept(user: User):
+def check_accept(user: User):
     global contest
     if contest == None:
         return False
+    print(user.to_string())
     # return cf.check_submission(user.codeforces_id, [int(contest.problem.contest_id), contest.problem.index], contest.begin_time, datetime.datetime.now())
     return cf.is_user_finished(user_name=user.codeforces_id, prob=contest.problem)
 
@@ -93,8 +94,13 @@ async def stop_mpc(matcher: Matcher):
     for user_name in contest.joinPerson:
         user = user_name[0]
         name = user_name[1]
-        state = "Accepted" if check_accept(user) else "Rejected"
-        table.append([name, state])
+        if(check_accept(user)) :
+            table.append([name, "Accepted"])
+        else :
+            table.append([name, "Rejected"])
+
+        # state = "Accepted" if check_accept(user) else "Rejected"
+        # table.append([name, state])
     contest = None
     timer = None
     await matcher.finish(Message(f'比赛结束，结果如下') + MessageSegment.image(await table_to_pic(f"比赛结果", headers, table)))

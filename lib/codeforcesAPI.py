@@ -439,7 +439,7 @@ def random_rating_problem(difficulty: int) -> Problem:
     # print(index)
     # print(name)
     op = Problem(name, contest_id, index, url, tag)
-    op.write()
+    print(op.write())
     return op
 
 def ask_for_problem_tag(problem_id) -> list[str]:
