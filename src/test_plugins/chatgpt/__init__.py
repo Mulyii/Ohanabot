@@ -68,7 +68,7 @@ def stop_bot(qq_account: DependClass):
 @chat.got("query", prompt="现在有最多十次的对话机会，你可以在任何时候输入exit提前结束对话")
 async def _(query: str = ArgPlainText(), qq_account: DependClass = Depends(DependClass, use_cache=False)):
     if qq_account.type == "private":
-        await chat.finish(f"!!!仅限公聊!!!")
+        await chat.finish(f"!!!仅限公聊使用!!!")
     uid = qq_account.uid
     if not bot_running(qq_account):
         try:
@@ -82,8 +82,8 @@ async def _(query: str = ArgPlainText(), qq_account: DependClass = Depends(Depen
 
     if counters[uid] == 10 or query == 'exit':
         if query != 'exit' :
-            await chat.send(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(await chatbots[uid].ask(query))))
+            await chat.finish(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(chatbots[uid].ask(query))))
         stop_bot(qq_account)
         await chat.finish(f"对话结束，感谢使用")
-    logger.info(counters[uid])
-    await chat.reject(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(await chatbots[uid].ask(query))))
+    # logger.info(counters[uid])
+    await chat.reject(Message(f'[CQ:at,qq={uid}]') + MessageSegment.image(await md_to_pic(chatbots[uid].ask(query))))
