@@ -42,7 +42,7 @@ class Problem: # 数据库题目类
     #     return f"{self.website}{self.index} {self.name}: {self.url}\ntags: {','.join(self.tags)}\nrating: {self.rating}"
 
     def write(self) -> str:
-        return f"{self.contest_id}{self.index}"
+        return f"{self.contest_id} {self.index}"
 
 class Score: # 数据库成绩类
     contest_id: int

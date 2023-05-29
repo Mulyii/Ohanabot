@@ -24,7 +24,7 @@ def get_user_status(user_name: str): # 获取用户提交列表
     global last_time
     now_time = datetime.datetime.now()
     while (now_time - last_time).seconds <= delay_time:
-        sleep(1)
+        sleep(2)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
 
@@ -52,7 +52,7 @@ def get_unsorted_problem_list() -> list:#得到未排序过的题目列表
     global last_time
     now_time = datetime.datetime.now()
     while (now_time - last_time).seconds <= delay_time:
-        sleep(1)
+        sleep(2)
         now_time = datetime.datetime.now()
     last_time = datetime.datetime.now()
 
@@ -438,7 +438,9 @@ def random_rating_problem(difficulty: int) -> Problem:
     # print(contest_id)
     # print(index)
     # print(name)
-    return Problem(name, contest_id, index, url, tag)
+    op = Problem(name, contest_id, index, url, tag)
+    op.write()
+    return op
 
 def ask_for_problem_tag(problem_id) -> list[str]:
     global last_time
