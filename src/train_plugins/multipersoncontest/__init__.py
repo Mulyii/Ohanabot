@@ -16,32 +16,32 @@ from lib.to_picture import table_to_pic
 from lib.dependclass import DependClass
 
 __plugin_meta__ = PluginMetadata(
-    name="多人运动",
+    name="多人竞赛",
     description="创建一场比赛或者加入一场正在进行的比赛",
-    usage="输入#mpm创建一场比赛(难度可选, 默认1500), 例: #mpm 1400, 输入#join加入正在进行的比赛",
+    usage="输入#mpc创建一场比赛(难度可选, 默认1500), 例: #mpc 1400, 输入#join加入正在进行的比赛",
     extra={
-        "unique_name": "multi-person_movement",
+        "unique_name": "multi-person_contest",
         "author": "xjq <466010106@qq.com>",
         "version": "1.0.0"
     }
 )
 
-multi_person_movement = on_command(
-    "mpm",
-    aliases={'多人运动', 'multi_person_movement', '多人比赛'},
+multi_person_contest = on_command(
+    "mpc",
+    aliases={'multi_person_contest', '多人竞赛'},
     priority=5,
     block=True
 )
 
 force_stop = on_command(
-    ("mpm", "stop"),
+    ("mpc", "stop"),
     priority=1,
     permission=SUPERUSER,
     block=True
 )
 
 
-class mpm:
+class mpc:
     def __init__(self, problem: Problem, begin_time=datetime.datetime.now(), length: float = 3600):
         self.problem = problem
         self.joinPerson: List[tuple(User, str)] = []
@@ -61,13 +61,13 @@ class mpm:
         return self.length
 
 
-contest: mpm = None
+contest: mpc = None
 timer: TimerHandle = None
 
 user_table = UserTable()
 
 
-def mpm_running():
+def mpc_running():
     return contest != None
 
 
@@ -79,13 +79,13 @@ async def check_accept(user: User):
     return cf.is_user_finished(user_name=user.codeforces_id, prob=contest.problem)
 
 
-async def create_mpm(matcher: Matcher, dif: int = 1500):
+async def create_mpc(matcher: Matcher, dif: int = 1500):
     global contest
-    contest = mpm(cf.random_rating_problem(dif))
+    contest = mpc(cf.random_rating_problem(dif))
     await matcher.finish(f'创建了一场比赛，比赛时间1h, 题目难度为{dif}，链接为:{contest.get_url()}, 输入#join可以加入这场比赛')
 
 
-async def stop_mpm(matcher: Matcher):
+async def stop_mpc(matcher: Matcher):
     global contest
     global timer
     table: List[List[str]] = []
@@ -102,19 +102,19 @@ async def stop_mpm(matcher: Matcher):
 
 @force_stop.handle()
 async def _(matcher: Matcher):
-    await stop_mpm(matcher)
+    await stop_mpc(matcher)
 
 
 def set_timeout(matcher: Matcher, timeout: float = 3600):
     global timer
     loop = asyncio.get_running_loop()
     mytimer = loop.call_later(
-        timeout, lambda: asyncio.ensure_future(stop_mpm(matcher))
+        timeout, lambda: asyncio.ensure_future(stop_mpc(matcher))
     )
     timer = mytimer
 
 
-@multi_person_movement.handle()
+@multi_person_contest.handle()
 async def _(matcher: Matcher, qq_account: DependClass = Depends(DependClass, use_cache=False)):
     global contest
     if contest != None:
@@ -122,7 +122,7 @@ async def _(matcher: Matcher, qq_account: DependClass = Depends(DependClass, use
     dif = qq_account.message.strip()
     if not dif:
         set_timeout(matcher)
-        await create_mpm(matcher)
+        await create_mpc(matcher)
     elif not dif.isdigit():
         await matcher.finish(f'请输入一个合法的难度')
     else:
@@ -132,7 +132,7 @@ async def _(matcher: Matcher, qq_account: DependClass = Depends(DependClass, use
         elif dif > 3500:
             dif = 3500
         set_timeout(matcher)
-        await create_mpm(matcher, dif)
+        await create_mpc(matcher, dif)
 
 join = on_command(
     "join",
@@ -146,7 +146,7 @@ join = on_command(
 async def _(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     global contest
     if contest == None:
-        await join.finish(f'没有正在进行的比赛，你可以发送#mpm创建一场比赛')
+        await join.finish(f'没有正在进行的比赛，你可以发送#mpc创建一场比赛')
     user: User = user_table.find_qq(qq_account.uid)
     if user == None:
         await join.finish(f'请先注册')
