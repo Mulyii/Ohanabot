@@ -54,9 +54,10 @@ async def response(receiver, mes: Union[str, bytes], depend: DependClass):  # re
     for i in range(1, len(ls)):
         insert_message += '\\' + '"' + ls[i]
     #print(insert_message)
-    interaction = InteractionMessage(datetime.datetime.now(), 'bot', depend.uid,  depend.type, depend.come_from, insert_message, depend.title)
-    interaction_table = InteractionTable()
-    interaction_table.insert(interaction)
+    if isinstance(mes, str) :
+        interaction = InteractionMessage(datetime.datetime.now(), 'bot', depend.uid,  depend.type, depend.come_from, insert_message, depend.title)
+        interaction_table = InteractionTable()
+        interaction_table.insert(interaction)
     if depend.type == "private":
         if isinstance(mes, str):
             await receiver.finish(Message(f'{mes}'))

@@ -48,8 +48,9 @@ async def mytest_start_receiver(qq_account: DependClass = Depends(DependClass, u
     if test is None:
         test_table.insert(Test(user.id, 0, 0, 0, 0, 0, 0, 0))
     test = test_table.find(user.id)
+    print(test)
     difficult_min = min(test.math, test.dp, test.other, test.graphic, test.strings, test.geometry, test.structure)
-    save_file = "./data/" + str(qq_account.uid) + "info.txt";
+    save_file = "./data/" + str(qq_account.uid) + "info.txt"
     if not os.path.exists(save_file):
         file = open(save_file, 'w')
         file.close()
@@ -72,7 +73,7 @@ async def mytest_start_receiver(qq_account: DependClass = Depends(DependClass, u
 @mytest_finish.handle()
 async def mytest_finish_receiver(qq_account: DependClass = Depends(DependClass, use_cache=False)):
     print("finish")
-    save_file = "./data/" + str(qq_account.uid) + "info.txt";
+    save_file = "./data/" + str(qq_account.uid) + "info.txt"
     if not os.path.exists(save_file):
         await response(mytest_finish, "请先使用#myteststart命令")
         return
